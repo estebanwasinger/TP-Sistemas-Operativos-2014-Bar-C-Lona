@@ -15,5 +15,6 @@ int main(void) {
 	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
 	puts("JUAN YA CLONÓ!!!!!!!!!!!!!!!!!!!!"); /* prints !!!Hello World!!! */
 	puts("CARO YA CLONÓ!!!!!!!!!!!!!!!!!!!!"); /* prints !!!Hello World!!! */
+	printf("Oscr ya clono");
 	return EXIT_SUCCESS;
 }

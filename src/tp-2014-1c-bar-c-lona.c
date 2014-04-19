@@ -10,12 +10,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <commons/temporal.h>
 
-int main1(void) {
-	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
-	puts("JUAN YA CLONÓ!!!!!!!!!!!!!!!!!!!!"); /* prints !!!Hello World!!! */
-	puts("CARO YA CLONÓ!!!!!!!!!!!!!!!!!!!!"); /* prints !!!Hello World!!! */
-	printf("Oscar ya clono!!!!!!!!!!!!!!!\n");
-	printf("Esteban (Mellado) ya clono! ;)");
+int main(void) {
+
+	char* tiempo = temporal_get_string_time();
+	printf("El tiepo es %s:", tiempo);
+	free(tiempo);
 	return EXIT_SUCCESS;
 }

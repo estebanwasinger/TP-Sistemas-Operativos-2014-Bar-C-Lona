@@ -29,7 +29,7 @@ all: tp-2014-1c-bar-c-lona
 tp-2014-1c-bar-c-lona: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "tp-2014-1c-bar-c-lona" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L../common -o "tp-2014-1c-bar-c-lona" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

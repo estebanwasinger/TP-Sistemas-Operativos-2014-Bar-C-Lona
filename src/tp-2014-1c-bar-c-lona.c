@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(void) {
+int main1(void) {
 	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
 	puts("JUAN YA CLONÓ!!!!!!!!!!!!!!!!!!!!"); /* prints !!!Hello World!!! */
 	puts("CARO YA CLONÓ!!!!!!!!!!!!!!!!!!!!"); /* prints !!!Hello World!!! */

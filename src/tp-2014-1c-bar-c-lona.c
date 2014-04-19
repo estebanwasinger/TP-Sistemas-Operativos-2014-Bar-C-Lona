@@ -15,7 +15,8 @@
 int main(void) {
 
 	char* tiempo = temporal_get_string_time();
-	printf("El tiepo es %s:", tiempo);
+	printf("El tiempo es %s:", tiempo);
 	free(tiempo);
+
 	return EXIT_SUCCESS;
 }

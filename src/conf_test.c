@@ -37,7 +37,7 @@ char * IP;
 
 int conf_es_valida(t_config * configuracion);
 
-int main(int argc, char **argv) {
+int main2(int argc, char **argv) {
 
 	t_config * configuracion;
 //	char * log_name;

@@ -16,6 +16,7 @@ int main2(void) {
 
 	char* tiempo = temporal_get_string_time();
 	printf("El tiempo es %s:", tiempo);
+	printf("agrego esta linea");
 	free(tiempo);
 
 	return EXIT_SUCCESS;

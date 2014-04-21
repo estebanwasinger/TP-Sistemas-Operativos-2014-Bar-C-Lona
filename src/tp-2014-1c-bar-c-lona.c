@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <commons/temporal.h>
 
-int main(void) {
+int main2(void) {
 
 	char* tiempo = temporal_get_string_time();
 	printf("El tiempo es %s:", tiempo);

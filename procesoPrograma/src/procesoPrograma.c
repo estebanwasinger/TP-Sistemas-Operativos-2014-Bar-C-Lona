@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <commons/config.h>
 #include <commons/log.h>
 
@@ -21,6 +22,8 @@ int main(int argc, char** argv) {
 	char c;
 	FILE *file;
 	t_config * configuracion;
+    char * temp_IP;
+
 
 	//-------------leer archivo de configuracion>------------//
 
@@ -38,8 +41,13 @@ int main(int argc, char** argv) {
 				return -2;
 			}
 
+
 		Puerto = config_get_int_value(configuracion,"Puerto");
-		IP = config_get_string_value(configuracion,"IP");
+		temp_IP = config_get_string_value(configuracion,"IP");
+		IP = malloc(strlen(temp_IP)+1);
+		strcpy(IP,temp_IP);
+
+
 
 	printf("Puerto=%d\n",Puerto); //imprime por pantalla el puerto
 	printf("IP=%s\n",IP);     //imprime por pantalla la IP

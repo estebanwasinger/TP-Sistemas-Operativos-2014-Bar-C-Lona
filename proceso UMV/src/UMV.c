@@ -10,6 +10,7 @@
 //Variables Globales de la UMV
 int *memFisica;
 t_list * segmentosUMV;
+int AlgoritmoActual = 1;
 
 
 /////////////   COMIENZO MAIN  ///////////////////
@@ -22,10 +23,6 @@ int main(void) {
 	memFisica = malloc(memTotal);
 
 	LanzarConsola();
-	int a = 0;
-	while(a > 105){
-		a++;
-	}
 
 	return EXIT_SUCCESS;
 }
@@ -56,6 +53,7 @@ int ObtenerCantidadMemoriaTotal(){
 void LanzarConsola(){
     pthread_t hilo_consola;
     pthread_create(&hilo_consola,NULL, (void*)Consola, NULL);
+    pthread_join(hilo_consola,NULL);
 }
 
 // maneja consola y controla los comandos ingresados por teclado
@@ -73,10 +71,14 @@ void Consola(){
 
 		while(c != '\n'){
 			//si hay un espacio agregamos el comando a la lista e intanceamos nueva string
-			if(c==' '){list_add(listaComandos,comando);   comando = string_new();}
-
-			comando[strlen(comando)] = c;
-			comando[strlen(comando)+1] ='\0';
+			if(c==' '){
+				list_add(listaComandos,comando);
+				comando = string_new();
+			}
+			else{
+				comando[strlen(comando)] = c;
+				comando[strlen(comando)+1] ='\0';
+			}
 			c = getchar();
 		}
 
@@ -89,8 +91,8 @@ void Consola(){
 Segmento *create_segmento(char* programa,int base, int baseVirtual,int tamano ){
 	Segmento *segmento_nuevo = malloc(sizeof(Segmento));
 	segmento_nuevo->base = base;
-	segmento_nuevo->programa = programa;
 	segmento_nuevo->baseVirtual = baseVirtual;
+	segmento_nuevo->programa = programa;
 	segmento_nuevo->tamano = tamano;
 
 	return segmento_nuevo;
@@ -101,5 +103,26 @@ int EjecutarComandos(t_list *lista){
 	printf("Comando!");
 	return 0;
 }
+
+// Alocar el un nuevo segmento
+int AlocarNuevoSegmento(){
+
+}
+
+// Permite el cambio de FirstFit a WorstFit
+void CambiarAlgoritmo(char* nombreAlgoritmo){
+	if(nombreAlgoritmo == "firstfit" || nombreAlgoritmo == "FirstFit" || nombreAlgoritmo == "FIRSTFIT"){
+		AlgoritmoActual = 1; printf(" Se a cambiado el algoritmo a FirstFit "); return;
+	}
+	if(nombreAlgoritmo == "worstfit" || nombreAlgoritmo == "WorstFit" || nombreAlgoritmo == "WORSTFIT"){
+			AlgoritmoActual = 2; printf(" Se a cambiado el algoritmo a WorstFit "); return;
+	}
+
+	printf("No existe un algoritmo con ese nombre");
+}
+
+
+
+
 
 

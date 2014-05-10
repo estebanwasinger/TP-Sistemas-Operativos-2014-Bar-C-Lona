@@ -26,7 +26,7 @@ void CambiarAlgoritmo(char* nombreAlgoritmo);
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
 int EjecutarComandos(t_list *lista);
-int AlocarNuevoSegmento();
+int GrabarNuevoSegmento();
 
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);
@@ -35,5 +35,7 @@ Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano)
 //Variables Estaticas
 int ALGOTIRMO_FIRSTFIT = 1;
 int ALGOTIRMO_WORSTFIT = 2;
+int TRUE = 0;
+int FALSE = 1;
 
 

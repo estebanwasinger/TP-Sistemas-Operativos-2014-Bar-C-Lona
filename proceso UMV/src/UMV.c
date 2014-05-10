@@ -16,6 +16,8 @@ int AlgoritmoActual = 1;
 /////////////   COMIENZO MAIN  ///////////////////
 
 int main(void) {
+	//Inicializamos las cosas
+	segmentosUMV = list_create();
 
 	// Obtenemos la cantidad de memoria y la alocamos
 	int memTotal = ObtenerCantidadMemoriaTotal();
@@ -99,28 +101,43 @@ Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano 
 }
 
 // Ejecuta los comandos que entran por la consola
-int EjecutarComandos(t_list *lista){
-	printf("Comando!");
+int EjecutarComandos(t_list *listaComandos){
+	char* nombreFuncion = string_new();
+	nombreFuncion =(char*) list_take(listaComandos,1);
+
+	if(string_equals_ignore_case("CambiarAlgoritmo",nombreFuncion) && (list_size(listaComandos) == 2)){ CambiarAlgoritmo(1);}
+
+
 	return 0;
 }
 
 // Alocar el un nuevo segmento
-int AlocarNuevoSegmento(char* programa,int base,int tamano){
-	Segmento nuevo_segmento = create_segmento(programa,(memFisica + base),base,tamano);
-
+int GrabarNuevoSegmento(char* programa,int base,int tamano){
+	Segmento * nuevo_segmento = create_segmento(programa,(memFisica + base),base,tamano);
+	list_add(segmentosUMV,nuevo_segmento);
 	return 1;
 }
 
 // Permite el cambio de FirstFit a WorstFit
 void CambiarAlgoritmo(char* nombreAlgoritmo){
-	if(strcmp(nombreAlgoritmo, "firstfit") || strcmp(nombreAlgoritmo, "FirstFit") ||strcmp(nombreAlgoritmo, "FirstFit")){
+	if(string_equals_ignore_case("firstfit",nombreAlgoritmo)){
 		AlgoritmoActual = ALGOTIRMO_FIRSTFIT; printf(" Se a cambiado el algoritmo a FirstFit "); return;
 	}
-	if(strcmp(nombreAlgoritmo, "worstfit") || strcmp(nombreAlgoritmo, "WORSTFIT") ||strcmp(nombreAlgoritmo, "WorstFit")){
+	if(string_equals_ignore_case("worstfit",nombreAlgoritmo)){
 		AlgoritmoActual = ALGOTIRMO_WORSTFIT; printf(" Se a cambiado el algoritmo a WorstFit "); return;
 	}
 
 	printf("No existe un algoritmo con ese nombre");
+}
+
+// Nos dice si hay memoria disponible junta para grabar un sengmento de tamaño fijo
+int SePuedeGrabarSegmento(int tamano){
+	return TRUE;
+}
+
+// Nos dice la cantidad total de memoria libre,
+int CantidadMemoriaLibre(int tamano){
+	return 1000;
 }
 
 

@@ -8,7 +8,7 @@
 #include <pthread.h>
 
 //Variables Globales de la UMV
-int *memFisica;
+void *memFisica;
 t_list * segmentosUMV;
 int AlgoritmoActual = 1;
 
@@ -88,7 +88,7 @@ void Consola(){
  }
 
 // crea un segmento nuevo
-Segmento *create_segmento(char* programa,int base, int baseVirtual,int tamano ){
+Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano ){
 	Segmento *segmento_nuevo = malloc(sizeof(Segmento));
 	segmento_nuevo->base = base;
 	segmento_nuevo->baseVirtual = baseVirtual;
@@ -105,17 +105,19 @@ int EjecutarComandos(t_list *lista){
 }
 
 // Alocar el un nuevo segmento
-int AlocarNuevoSegmento(){
+int AlocarNuevoSegmento(char* programa,int base,int tamano){
+	Segmento nuevo_segmento = create_segmento(programa,(memFisica + base),base,tamano);
 
+	return 1;
 }
 
 // Permite el cambio de FirstFit a WorstFit
 void CambiarAlgoritmo(char* nombreAlgoritmo){
-	if(nombreAlgoritmo == "firstfit" || nombreAlgoritmo == "FirstFit" || nombreAlgoritmo == "FIRSTFIT"){
-		AlgoritmoActual = 1; printf(" Se a cambiado el algoritmo a FirstFit "); return;
+	if(strcmp(nombreAlgoritmo, "firstfit") || strcmp(nombreAlgoritmo, "FirstFit") ||strcmp(nombreAlgoritmo, "FirstFit")){
+		AlgoritmoActual = ALGOTIRMO_FIRSTFIT; printf(" Se a cambiado el algoritmo a FirstFit "); return;
 	}
-	if(nombreAlgoritmo == "worstfit" || nombreAlgoritmo == "WorstFit" || nombreAlgoritmo == "WORSTFIT"){
-			AlgoritmoActual = 2; printf(" Se a cambiado el algoritmo a WorstFit "); return;
+	if(strcmp(nombreAlgoritmo, "worstfit") || strcmp(nombreAlgoritmo, "WORSTFIT") ||strcmp(nombreAlgoritmo, "WorstFit")){
+		AlgoritmoActual = ALGOTIRMO_WORSTFIT; printf(" Se a cambiado el algoritmo a WorstFit "); return;
 	}
 
 	printf("No existe un algoritmo con ese nombre");

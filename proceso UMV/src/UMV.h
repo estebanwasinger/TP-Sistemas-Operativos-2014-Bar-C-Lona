@@ -9,7 +9,7 @@
 //Definicion de Structss
 typedef struct{
    char* programa;
-   int base;
+   void* base;
    int baseVirtual;
    int tamano;
 }Segmento;
@@ -21,15 +21,19 @@ void compactar_memoria();
 void switch_function(char* funcion);
 void LanzarConsola();
 void Consola();
-int EjecutarComandos(t_list *lista);
+void CambiarAlgoritmo(char* nombreAlgoritmo);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
+int EjecutarComandos(t_list *lista);
+int AlocarNuevoSegmento();
 
 //Otra firmas de funciones
-Segmento *create_segmento(char* programa,int base, int baseVirtual,int tamano);
+Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);
 
 
 //Variables Estaticas
+int ALGOTIRMO_FIRSTFIT = 1;
+int ALGOTIRMO_WORSTFIT = 2;
 
 

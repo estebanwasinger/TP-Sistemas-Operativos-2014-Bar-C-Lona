@@ -13,15 +13,25 @@
 #include <string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+#include <commons/string.h>
 #include "procesoPrograma.h"
 
 int Puerto;
 char * IP;
+t_log * logger;
 
 int main(int argc, char** argv) {
 	FILE *file;
 	t_config * configuracion;
 	char * temp_IP;
+    char * log_name;
+
+    log_name = malloc(strlen("Programa")+1);
+    strcpy(log_name, "Programa");
+    string_append(&log_name,".log"); // queda : nombre.log
+
+    logger = log_create(log_name, "Programa", 1, LOG_LEVEL_TRACE);
+    free(log_name);
 
 	//-------------leer archivo de configuracion>------------//
 
@@ -43,6 +53,8 @@ int main(int argc, char** argv) {
 	temp_IP = config_get_string_value(configuracion, "IP");
 	IP = malloc(strlen(temp_IP) + 1);
 	strcpy(IP, temp_IP);
+
+	log_info(logger,"EL ARCHIVO DE CONFIGURACION SE LEVANTO CORRECTAMENTE");
 
 	printf("Puerto=%d\n", Puerto); //imprime por pantalla el puerto
 	printf("IP=%s\n", IP);     //imprime por pantalla la IP

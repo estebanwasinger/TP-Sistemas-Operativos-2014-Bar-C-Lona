@@ -100,22 +100,39 @@ Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano 
 	return segmento_nuevo;
 }
 
+// crea un rango de memoria
+RangoMemoria *create_rango_mem(int base,int tamano ){
+	RangoMemoria *aRango = malloc(sizeof(RangoMemoria));
+	aRango->base = base;
+	aRango->tamano = tamano;
+
+	return aRango;
+}
+
 // Ejecuta los comandos que entran por la consola
 int EjecutarComandos(t_list *listaComandos){
 	char* nombreFuncion = string_new();
-	nombreFuncion =(char*) list_take(listaComandos,1);
-
-	if(string_equals_ignore_case("CambiarAlgoritmo",nombreFuncion) && (list_size(listaComandos) == 2)){ CambiarAlgoritmo(1);}
-
+	nombreFuncion =(char*)list_get(listaComandos,0);
 
 	return 0;
 }
 
-// Alocar el un nuevo segmento
-int GrabarNuevoSegmento(char* programa,int base,int tamano){
-	Segmento * nuevo_segmento = create_segmento(programa,(memFisica + base),base,tamano);
-	list_add(segmentosUMV,nuevo_segmento);
-	return 1;
+// guarda el un nuevo segmento ordenado por su base en lista de segmentos
+int GrabarNuevoSegmento(char* programa,int baseVirtual,int tamano){
+	Segmento * nuevo_segmento = create_segmento(programa,(memFisica + baseVirtual),baseVirtual,tamano);
+
+	if(list_is_empty(segmentosUMV)){     // si la lista esta vacia lo agregamos en la primer posicion
+		list_add(segmentosUMV,nuevo_segmento);
+		return 1;
+	}
+	else{   // si no esta vacia agregamos ordenado por la baseVirtual
+		int pos = 0;
+		while(list_size(segmentosUMV)-1 != pos && ((Segmento*)list_get(segmentosUMV,pos))->baseVirtual > baseVirtual ){
+			pos++;
+		}
+		list_add_in_index(segmentosUMV,pos,nuevo_segmento);
+		return 1;
+	}
 }
 
 // Permite el cambio de FirstFit a WorstFit
@@ -131,15 +148,61 @@ void CambiarAlgoritmo(char* nombreAlgoritmo){
 }
 
 // Nos dice si hay memoria disponible junta para grabar un sengmento de tamaño fijo
-int SePuedeGrabarSegmento(int tamano){
-	return TRUE;
+bool SePuedeGrabarSegmento(int tamano){
+
+	t_list *listaRangosLibres = RangosLibresDeMemoria();
+
+	// esta funcion auxiliar para fijarse si algun rango satisface la condicion
+	int hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango) {
+		return rango->tamano >= tamano;
+	}
+	return list_any_satisfy(listaRangosLibres, (void*)hay_algun_rango_de_tamano_suficiente);
+
 }
 
 // Nos dice la cantidad total de memoria libre,
 int CantidadMemoriaLibre(int tamano){
-	return 1000;
+
+	int tamanoTotal;
+
+	void contarTamaño(RangoMemoria* rango) {
+			tamanoTotal = tamanoTotal + rango->tamano ;
+	}
+
+	t_list* rangosLibres = RangosLibresDeMemoria();
+	list_iterate(rangosLibres, (void*)contarTamaño);
+
+	return tamanoTotal;
 }
 
+// Nos devuelve un array de RangosDeMemoria con todos los rangos de memoria libres;
+t_list *RangosLibresDeMemoria(){
+	int pos = 0;
+	int salida, llegada;
+	RangoMemoria *rangoMem;
+	t_list * rangos_de_memoria = list_create();
+
+	while(list_size(segmentosUMV) - 1 <= pos){
+		Segmento segmentoAnterior = *((Segmento*)list_get(segmentosUMV, pos));
+		Segmento segmentoPosterior = *((Segmento*)list_get(segmentosUMV, pos+1));
+
+		salida = segmentoAnterior.baseVirtual + segmentoAnterior.tamano;
+		llegada = segmentoPosterior.baseVirtual;
+
+		//con esto nos fijamos si hay espacio entre medio de los dos nodos
+		if(salida < llegada){
+			rangoMem = create_rango_mem(salida,llegada - salida);
+			list_add(rangos_de_memoria,rangoMem);
+		}
+	}
+
+	return rangos_de_memoria;
+}
+
+// compacta la memoria dejando tod el espacio libre junto.
+void CompactaMemoria(){
+
+}
 
 
 

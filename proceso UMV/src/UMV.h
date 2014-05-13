@@ -23,18 +23,17 @@ typedef struct{
 
 
 // Firmas funciones Void
-void compactar_memoria();
-void switch_function(char* funcion);
 void LanzarConsola();
 void Consola();
 void CambiarAlgoritmo(char* nombreAlgoritmo);
 void CompactaMemoria();
-void contarTamaño(RangoMemoria* rango);
+void ContarTamano(RangoMemoria* rango);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
 int EjecutarComandos(t_list *lista);
 int GrabarNuevoSegmento();
+int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
 
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);

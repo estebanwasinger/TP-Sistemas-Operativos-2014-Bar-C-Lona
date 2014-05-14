@@ -14,15 +14,13 @@
 #include <commons/config.h>
 #include <commons/log.h>
 #include <commons/string.h>
-
+#include "CPU.h"
 
 int Puerto_Kernel;
 int Puerto_UMV;
 char * IP_Kernel;
 char * IP_UMV;
 t_log * logger;
-
-int conf_es_valida(t_config * configuracion);
 
 int main(int argc, char **argv) {
 

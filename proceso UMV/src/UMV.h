@@ -34,7 +34,7 @@ void * Consultar(int posMem);
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
 int EjecutarComandos(t_list *lista);
-int GrabarNuevoSegmento();
+int GuardarNuevoSegmentoOrdenado();
 int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
 int CantidadMemoriaLibre();
 

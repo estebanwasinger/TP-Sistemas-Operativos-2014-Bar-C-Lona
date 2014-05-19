@@ -18,6 +18,7 @@ int AlgoritmoActual = 1;
 int main(void) {
 	//Inicializamos las cosas
 	segmentosUMV = list_create();
+	srand(time(NULL));
 
 	// Obtenemos la cantidad de memoria y la alocamos
     memTotal = ObtenerCantidadMemoriaTotal();
@@ -131,7 +132,7 @@ int EjecutarComandos(t_list *listaComandos) {
 }
 
 // guarda el un nuevo segmento ordenado por su base en lista de segmentos
-int GrabarNuevoSegmento(char* programa, int baseVirtual, int tamano) {
+int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano) {
 	Segmento * nuevo_segmento = create_segmento(programa,
 			(memFisica + baseVirtual), baseVirtual, tamano);
 
@@ -288,7 +289,9 @@ void CompactaMemoria(){
 
 // graba en la memoria un elemento, en la posicion indicada
 void Grabar(int posMem, void * element){
-	memFisica + posMem = element;
+	void * savePointer;
+	savePointer = memFisica + posMem;
+	savePointer = element;
 }
 
 // pide datos
@@ -296,5 +299,38 @@ void * Consultar(int posMem){
 	return memFisica + posMem;
 }
 
+// Elije una base aleatoria y graba el segmento segun el algoritmo indicado
+void GrabarSegmento(char* programa, int tamanoSegmento){
 
+	if(!SePuedeGrabarSegmento(tamanoSegmento)){
+		printf("No hay memoria para grabar el segmento");
+		return;
+	}
+	// Obtenemos una base aleatoria
 
+	if(ALGOTIRMO_FIRSTFIT == AlgoritmoActual){
+
+	}
+	else{
+		RangoMemoria elRangoGrande = RangoMasGrandeLibre();
+		int base = (rand() % (elRangoGrande.base + elRangoGrande.tamano)) + (elRangoGrande.base + elRangoGrande.tamano - tamanoSegmento);
+	}
+}
+
+// Nos devuelve la pos del rango de mayor tamaño
+RangoMemoria  RangoMasGrandeLibre(){
+	int pos = 0;
+	int mayorTamano;
+	RangoMemoria mayorRango;
+	t_list * rangos = RangosLibresDeMemoria();
+
+	while(list_size(rangos) > pos){
+		RangoMemoria rango = *((RangoMemoria*)list_get(rangos,pos));
+		if(rango.tamano > mayorTamano){
+			mayorRango = rango;
+			mayorTamano = rango.tamano;
+		}
+	}
+
+	return mayorRango;
+}

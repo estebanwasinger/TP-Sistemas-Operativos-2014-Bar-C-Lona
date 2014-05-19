@@ -284,8 +284,17 @@ void CompactaMemoria(){
 
 		pos++;
 	}
-
-
 }
+
+// graba en la memoria un elemento, en la posicion indicada
+void Grabar(int posMem, void * element){
+	memFisica + posMem = element;
+}
+
+// pide datos
+void * Consultar(int posMem){
+	return memFisica + posMem;
+}
+
 
 

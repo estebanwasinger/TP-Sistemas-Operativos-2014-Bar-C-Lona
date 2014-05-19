@@ -28,6 +28,8 @@ void Consola();
 void CambiarAlgoritmo(char* nombreAlgoritmo);
 void CompactaMemoria();
 void ContarTamano(RangoMemoria* rango);
+void Grabar(int posMem, void * element);
+void * Consultar(int posMem);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
@@ -35,6 +37,7 @@ int EjecutarComandos(t_list *lista);
 int GrabarNuevoSegmento();
 int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
 int CantidadMemoriaLibre();
+
 
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);

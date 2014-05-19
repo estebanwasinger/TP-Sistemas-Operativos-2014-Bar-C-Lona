@@ -34,6 +34,7 @@ int ObtenerCantidadMemoriaTotal();
 int EjecutarComandos(t_list *lista);
 int GrabarNuevoSegmento();
 int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
+int CantidadMemoriaLibre();
 
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);

@@ -9,6 +9,7 @@
 
 //Variables Globales de la UMV
 void *memFisica;
+int memTotal;
 t_list * segmentosUMV;
 int AlgoritmoActual = 1;
 
@@ -19,7 +20,7 @@ int main(void) {
 	segmentosUMV = list_create();
 
 	// Obtenemos la cantidad de memoria y la alocamos
-	int memTotal = ObtenerCantidadMemoriaTotal();
+    memTotal = ObtenerCantidadMemoriaTotal();
 	if (memTotal <= 0) {
 		printf("Error De Archivo De Config");
 		return -1;
@@ -139,11 +140,9 @@ int GrabarNuevoSegmento(char* programa, int baseVirtual, int tamano) {
 		return 1;
 	} else {   // si no esta vacia agregamos ordenado por la baseVirtual
 		int pos = 0;
-		while (list_size(segmentosUMV) - 1 != pos
-				&& ((Segmento*) list_get(segmentosUMV, pos))->baseVirtual
-						> baseVirtual) {
-			pos++;
-		}
+		while (list_size(segmentosUMV) - 1 != pos && ((Segmento*) list_get(segmentosUMV, pos))->baseVirtual > baseVirtual)// vamos a la posicion donde este ordenado
+		{    pos++;     }
+
 		list_add_in_index(segmentosUMV, pos, nuevo_segmento);
 		return 1;
 	}
@@ -179,9 +178,9 @@ bool SePuedeGrabarSegmento(int tamano) {
 }
 
 // Nos dice la cantidad total de memoria libre,
-int CantidadMemoriaLibre(int tamano) {
+int CantidadMemoriaLibre() {
 
-	int tamanoTotal;
+	int tamanoTotal = 0;
 
 	void ContarTamano(RangoMemoria* rango)
 	{
@@ -196,13 +195,20 @@ int CantidadMemoriaLibre(int tamano) {
 }
 
 // Nos devuelve un array de RangosDeMemoria con todos los rangos de memoria libres;
-t_list *RangosLibresDeMemoria() {
+t_list *RangosLibresDeMemoria(){
 	int pos = 0;
 	int salida, llegada;
 	RangoMemoria *rangoMem;
 	t_list * rangos_de_memoria = list_create();
 
-	while (list_size(segmentosUMV) - 1 <= pos) {
+	if(list_is_empty(segmentosUMV)){
+		rangoMem = create_rango_mem(0,memTotal);
+		list_add(rangos_de_memoria, rangoMem);
+		return rangos_de_memoria;
+	}
+
+
+	while (list_size(segmentosUMV) - 1 > pos) {
 		Segmento segmentoAnterior = *((Segmento*) list_get(segmentosUMV, pos));
 		Segmento segmentoPosterior = *((Segmento*) list_get(segmentosUMV,
 				pos + 1));
@@ -211,27 +217,75 @@ t_list *RangosLibresDeMemoria() {
 		llegada = segmentoPosterior.baseVirtual;
 
 		//con esto nos fijamos si hay espacio entre medio de los dos nodos
-		if (salida < llegada) {
+		if (salida < (llegada - 1)) {
 			rangoMem = create_rango_mem(salida, llegada - salida);
 			list_add(rangos_de_memoria, rangoMem);
 		}
 	}
 
+	// Ultimo segmento a analizar
+	Segmento ultimoSegmento = *((Segmento*) list_get(segmentosUMV, pos));
+	salida = ultimoSegmento.baseVirtual + ultimoSegmento.tamano;
+
+	if(memTotal > salida){ // si no esta tocando el final de nuestra memoria
+		rangoMem = create_rango_mem(salida, memTotal);
+		list_add(rangos_de_memoria, rangoMem);
+	}
+
+
 	return rangos_de_memoria;
 }
 
 // compacta la memoria dejando tod el espacio libre junto.
-void CompactaMemoria() {
+void CompactaMemoria(){
 	int pos = 0;
+	int salida, llegada;
 
-	while(list_size(segmentosUMV) >= pos){
+	if(list_is_empty(segmentosUMV)){
+		printf("No Hay nada que compactar");
+		return;
+	}
 
-		Segmento segmentoPrimero = *((Segmento*)list_get(segmentoPrimero,pos));
-		Segmento segmentoPrimero = *((Segmento*)list_get(segmentoPrimero,pos + 1));
+	Segmento segPrimero = *((Segmento*)list_get(segmentosUMV,pos));
 
+	// Nos traemos el primer segmento a la poscicion 0 si no estaba ahi.
+	if(segPrimero.baseVirtual != 0){
+		void* baseFisica = memFisica;
+		Segmento * segAcomodado = create_segmento(segPrimero.programa,baseFisica,0,segPrimero.tamano);
+
+		// copaimos toda la info del segmento y la ponemos donde va a estar el nuevo
+		memcpy(baseFisica,segPrimero.base,segPrimero.tamano);
+
+		//remplazamos el segmento viejo por el modificado
+		list_replace(segmentosUMV,pos,segAcomodado);
+	}
+
+
+	while(list_size(segmentosUMV) - 1 > pos && list_size(segmentosUMV) > 1){
+
+		Segmento segPrimero = *((Segmento*)list_get(segmentosUMV,pos));
+		Segmento segSegundo = *((Segmento*)list_get(segmentosUMV,pos + 1));
+		salida = segPrimero.baseVirtual + segPrimero.tamano;
+		llegada = segSegundo.baseVirtual;
+
+
+		//con esto nos fijamos si hay espacio entre medio de los dos nodos
+		if (salida < (llegada - 1)) {
+			// si estaban separados compactamos
+			void* baseFisica = memFisica + salida + 1;
+			Segmento * segAcomodado = create_segmento(segSegundo.programa,baseFisica,salida+1,segSegundo.tamano);
+
+			// copaimos toda la info del segmento y la ponemos donde va a estar el nuevo
+			memcpy(baseFisica,segSegundo.base,segSegundo.tamano);
+
+			//remplazamos el segmento viejo por el modificado
+			list_replace(segmentosUMV,pos + 1,segAcomodado);
+		}
 
 		pos++;
 	}
+
+
 }
 
 

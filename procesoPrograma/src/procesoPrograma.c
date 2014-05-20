@@ -15,6 +15,10 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include "procesoPrograma.h"
+#include <sys/socket.h>
+
+#define DIRECCION "127.0.0.1"
+#define PUERTO 5000
 
 int Puerto;
 char * IP;
@@ -22,43 +26,55 @@ t_log * logger;
 
 int main(int argc, char** argv) {
 	FILE *file;
-	t_config * configuracion;
-	char * temp_IP;
-    char * log_name;
+//	t_config * configuracion;
+//	char * temp_IP;
+//    char * log_name;
+//
+//    log_name = malloc(strlen("Programa")+1);
+//    strcpy(log_name, "Programa");
+//    string_append(&log_name,".log"); // queda : nombre.log
+//
+//    logger = log_create(log_name, "Programa", 1, LOG_LEVEL_TRACE);
+//    free(log_name);
+//
+//	//-------------leer archivo de configuracion>------------//
+//
+//	if (argc != 3) //controlar que haya exactamente dos parámetro
+//			{
+//		puts("Uso: programa <arch.conf>\n");
+//		return -1;  // esto me saca inmediatamente del main ?
+//	}
+//
+//	configuracion = config_create(argv[1]);
+//
+//	if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
+//			{
+//		puts("Archivo de configuracion incompleto o invalido.\n");
+//		return -2;
+//	}
+//
+//	Puerto = config_get_int_value(configuracion, "Puerto");
+//	temp_IP = config_get_string_value(configuracion, "IP");
+//	IP = malloc(strlen(temp_IP) + 1);
+//	strcpy(IP, temp_IP);
+//
+//	log_info(logger,"EL ARCHIVO DE CONFIGURACION SE LEVANTO CORRECTAMENTE");
+//
+//	printf("Puerto=%d\n", Puerto); //imprime por pantalla el puerto
+//	printf("IP=%s\n", IP);     //imprime por pantalla la IP
+//	printf("\n");
 
-    log_name = malloc(strlen("Programa")+1);
-    strcpy(log_name, "Programa");
-    string_append(&log_name,".log"); // queda : nombre.log
+	struct sockaddr_in socketInfo;
+	char buffer[1028];
+	printf("Conectando...\n");
 
-    logger = log_create(log_name, "Programa", 1, LOG_LEVEL_TRACE);
-    free(log_name);
+	socketInfo.sin_family = AF_INET;
+	socketInfo.sin_addr.s_addr = inet_addr(DIRECCION);
+	socketInfo.sin_port = htons(PUERTO);
 
-	//-------------leer archivo de configuracion>------------//
-
-	if (argc != 3) //controlar que haya exactamente dos parámetro
-			{
-		puts("Uso: programa <arch.conf>\n");
-		return -1;  // esto me saca inmediatamente del main ?
-	}
-
-	configuracion = config_create(argv[1]);
-
-	if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
-			{
-		puts("Archivo de configuracion incompleto o invalido.\n");
-		return -2;
-	}
-
-	Puerto = config_get_int_value(configuracion, "Puerto");
-	temp_IP = config_get_string_value(configuracion, "IP");
-	IP = malloc(strlen(temp_IP) + 1);
-	strcpy(IP, temp_IP);
-
-	log_info(logger,"EL ARCHIVO DE CONFIGURACION SE LEVANTO CORRECTAMENTE");
-
-	printf("Puerto=%d\n", Puerto); //imprime por pantalla el puerto
-	printf("IP=%s\n", IP);     //imprime por pantalla la IP
-	printf("\n");
+	int socketKernel;
+	socketKernel = socket(AF_INET,SOCK_STREAM,0);
+	connect(socketKernel,(struct sockaddr*) &socketInfo, sizeof(socketInfo));
 
 	file = abrir_archivoRO(argv);
 	int size = size_archivo(file);
@@ -102,6 +118,9 @@ void leer_codAnsisop(FILE *file) {
  *
  */
 FILE *abrir_archivoRO(char** argv){
-	return (fopen(argv[2], "r"));
+	printf("\n %s \n",argv[0]);
+	printf("%s \n",argv[1]);
+	printf("%s \n",argv[2]);
+	return (fopen("facil.ansisop", "r"));
 }
 

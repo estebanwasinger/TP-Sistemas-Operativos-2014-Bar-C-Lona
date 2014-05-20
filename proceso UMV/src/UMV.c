@@ -28,6 +28,7 @@ int main(void) {
 	}
 	memFisica = malloc(memTotal);
 
+	// comienzan a correr los procesos
 	LanzarConsola();
 
 	return EXIT_SUCCESS;
@@ -122,6 +123,7 @@ int EjecutarComandos(t_list *listaComandos) {
 	char *nombreFuncion = string_new();
 	int cantidadParams = list_size(listaComandos) - 1;
 	nombreFuncion = (char*) list_get(listaComandos, 0);
+
 	if(string_equals_ignore_case(nombreFuncion, "compactar") && cantidadParams == 0){
 		CompactaMemoria(); return 1;
 	}
@@ -132,7 +134,7 @@ int EjecutarComandos(t_list *listaComandos) {
 }
 
 // guarda el un nuevo segmento ordenado por su base en lista de segmentos
-int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano) {
+int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano){
 	Segmento * nuevo_segmento = create_segmento(programa,
 			(memFisica + baseVirtual), baseVirtual, tamano);
 
@@ -306,14 +308,29 @@ void GrabarSegmento(char* programa, int tamanoSegmento){
 		printf("No hay memoria para grabar el segmento");
 		return;
 	}
-	// Obtenemos una base aleatoria
 
+	// segun el algoritmo se elige una base aleatoria.
 	if(ALGOTIRMO_FIRSTFIT == AlgoritmoActual){
+		int pos = 0;
+		int tamanoRangoLibre = 0;
+		RangoMemoria rango;
+
+		// calculamos el primer rango de memoria en el que entra el segmento
+		while(tamanoRangoLibre < tamanoSegmento ){
+			rango = list_get(RangosLibresDeMemoria(),pos);
+			tamanoRangoLibre = rango.tamano;
+			pos++;
+		}
+		// calculamos la base aletoria dentro del rango
+		int base = (rand() % (rango.base + rango.tamano)) + (rango.base + rango.tamano - tamanoSegmento);
+		GuardarNuevoSegmentoOrdenado(programa,base,tamanoSegmento);
 
 	}
 	else{
 		RangoMemoria elRangoGrande = RangoMasGrandeLibre();
+		// calculamos la base, es un numero random en el que puede entrar el segmento dentro del mayor rango de memoria libre
 		int base = (rand() % (elRangoGrande.base + elRangoGrande.tamano)) + (elRangoGrande.base + elRangoGrande.tamano - tamanoSegmento);
+		GuardarNuevoSegmentoOrdenado(programa,base,tamanoSegmento);
 	}
 }
 

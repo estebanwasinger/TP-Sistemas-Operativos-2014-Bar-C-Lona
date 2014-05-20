@@ -30,6 +30,8 @@ void CompactaMemoria();
 void ContarTamano(RangoMemoria* rango);
 void Grabar(int posMem, void * element);
 void * Consultar(int posMem);
+void GrabarSegmento(char* programa, int tamanoSegmento);
+int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
@@ -42,6 +44,7 @@ int CantidadMemoriaLibre();
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);
 t_list *RangosLibresDeMemoria();
+RangoMemoria  RangoMasGrandeLibre();
 
 
 //Variables Estaticas

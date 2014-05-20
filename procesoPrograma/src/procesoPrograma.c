@@ -15,10 +15,22 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include "procesoPrograma.h"
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <sys/epoll.h>
+#include <errno.h>
+#include <sys/ioctl.h>
 
 #define DIRECCION "127.0.0.1"
 #define PUERTO 5000
+#define MAX_CONNECTION_SERVER 60
 
 int Puerto;
 char * IP;
@@ -64,23 +76,28 @@ int main(int argc, char** argv) {
 //	printf("IP=%s\n", IP);     //imprime por pantalla la IP
 //	printf("\n");
 
-	struct sockaddr_in socketInfo;
-	char buffer[1028];
-	printf("Conectando...\n");
+//	struct sockaddr_in socketInfo;
 
-	socketInfo.sin_family = AF_INET;
-	socketInfo.sin_addr.s_addr = inet_addr(DIRECCION);
-	socketInfo.sin_port = htons(PUERTO);
+	//**********************************//
+	//	   Conexión con el Kernel		//
+	//**********************************//
 
 	int socketKernel;
-	socketKernel = socket(AF_INET,SOCK_STREAM,0);
-	connect(socketKernel,(struct sockaddr*) &socketInfo, sizeof(socketInfo));
+	socketKernel = socket_crearCliente();
+	socket_conectarCliente(socketKernel, "127.0.0.1", 5000);
+
+	//**********************************//
+	//	   Leectura y envio de codigo	//
+	//**********************************//
 
 	file = abrir_archivoRO(argv);
 	int size = size_archivo(file);
-	leer_codAnsisop(file);
-	printf("%d", size);
+	char* codigo = leer_codAnsisop(file);
 
+	send(socketKernel, codigo, size, 0);
+	send(socketKernel,"fin",3,0);
+
+	close(socketKernel);
 	return EXIT_SUCCESS;
 }
 
@@ -98,18 +115,25 @@ int size_archivo(FILE *file) {
 	return size;
 }
 
-void leer_codAnsisop(FILE *file) {
+char* leer_codAnsisop(FILE *file) {
 	char c;
-	//while ((c = getc(file)) != '\n')
-	//	(c = getc(file));
-
-	while ((c = getc(file)) != EOF) //Lee cada caracter hasta encuentre el EndOfFile
-		if (c == '\n')
-			printf("\n");//Si encuentra el \n baja de linea
-		else
-			printf("%c", c); // y cualquier caracter que encuentra lo imprime por pantalla
+	fseek(file, 0L, SEEK_END);
+	int size = ftell(file);
+	fseek(file, 0L, SEEK_SET);
+	int size2 = size;
+	char* text = malloc(size2);
+	char text2[size2];
+	int i = 0;
+//	while ((c = getc(file)) != '\n')
+//		(c = getc(file));
+	while ((c = getc(file)) != EOF) { //Lee cada caracter hasta encuentre el EndOfFile
+		text2[i] = c;
+		i++;
+	}
+	strcpy(text, text2);
 
 	fclose(file);
+	return text;
 }
 
 /*
@@ -117,10 +141,150 @@ void leer_codAnsisop(FILE *file) {
  *
  *
  */
-FILE *abrir_archivoRO(char** argv){
-	printf("\n %s \n",argv[0]);
-	printf("%s \n",argv[1]);
-	printf("%s \n",argv[2]);
-	return (fopen("facil.ansisop", "r"));
+FILE *abrir_archivoRO(char** argv) {
+	//printf("%s \n", argv[2]);
+	return (fopen("completo.ansisop", "r"));
+}
+
+int socket_crearCliente(void) {
+
+	int sockfd;
+
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("Error al crear socket"); //Crear log para este error.
+		return -1;
+	}
+
+	return sockfd;
+
+}
+
+int socket_conectarCliente(int sockfd, char *serverIp, int serverPort) {
+
+	struct sockaddr_in socketInfo;
+
+	//INICIALIZACION DE SOCKETINFO
+	socketInfo.sin_family = AF_INET;
+	socketInfo.sin_port = htons(serverPort); //host to network short
+	socketInfo.sin_addr.s_addr = inet_addr(serverIp);
+	memset(&(socketInfo.sin_zero), '\0', 8); // PONGO A 0 EL RESTO DE LA ESTRUCTURA
+	// ME CONECTO CON LA DIRECCIÓN DE SOCKETINFO
+	//SIEMPRE VERIFICANDO QUE NO DEN -1 LAS FUNCIONES O 0 EN CASO DE RECV() -- SOLO PARA SERVER IGUAL :)
+
+	if (connect(sockfd, (struct sockaddr *) &socketInfo, sizeof(socketInfo))
+			== -1) {
+		perror("Falló la conexión"); // Cambiar esto por un log.
+		return -1;
+	}
+
+	return sockfd;
+}
+int socket_crearYConectarCliente(char *serverIp, int serverPort) {
+	int sockfd;
+	sockfd = socket_crearCliente();
+	if (sockfd < 0)
+		return -1;
+
+	sockfd = socket_conectarCliente(sockfd, (char*) serverIp, serverPort);
+
+	return sockfd;
+}
+int socket_crearServidor(char *ip, int port) {
+	int socketEscucha;
+	struct sockaddr_in miSocket; //ESTE ES EL SOCKET CON LA DRECCION IP
+
+	if ((socketEscucha = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("Error al crear socket");
+		return -1;
+	}
+
+	miSocket.sin_family = AF_INET;
+	miSocket.sin_port = htons(port);
+	miSocket.sin_addr.s_addr = inet_addr(ip);
+	memset(&(miSocket.sin_zero), '\0', 8); //NI LE PRESTEN ATENCION A ESTO
+
+	int yes = 1;
+	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
+			== -1) {
+		perror("setsockopt");
+		exit(1);
+	}
+
+	if (bind(socketEscucha, (struct sockaddr*) &miSocket, sizeof(miSocket))
+			== -1) {
+		perror("Error al bindear el socket escucha");
+		return -1;
+	}
+
+	if (listen(socketEscucha, MAX_CONNECTION_SERVER) == -1) {
+		perror("Error en la puesta de escucha");
+		return -1;
+	}
+
+	return socketEscucha;
+
+}
+int socket_crearServidorPuertoRandom(char *ip, int * port) {
+	int socketEscucha;
+	struct sockaddr_in miSocket; //ESTE ES EL SOCKET CON LA DRECCION IP
+
+	if ((socketEscucha = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("Error al crear socket");
+		return -1;
+	}
+
+	miSocket.sin_family = AF_INET;
+	miSocket.sin_port = htons(0);
+	miSocket.sin_addr.s_addr = inet_addr(ip);
+	memset(&(miSocket.sin_zero), '\0', 8); //NI LE PRESTEN ATENCION A ESTO
+
+	int yes = 1;
+	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
+			== -1) {
+		perror("setsockopt");
+		exit(1);
+	}
+
+	if (bind(socketEscucha, (struct sockaddr*) &miSocket, sizeof(miSocket))
+			== -1) {
+		perror("Error al bindear el socket escucha");
+		return -1;
+	}
+
+	if (listen(socketEscucha, MAX_CONNECTION_SERVER) == -1) {
+		perror("Error en la puesta de escucha");
+		return -1;
+	}
+
+	struct sockaddr_in sin;
+	socklen_t len = sizeof(sin);
+	if (getsockname(socketEscucha, (struct sockaddr *) &sin, &len) == -1) {
+		perror("getsockname");
+		return -1;
+	}
+
+	*port = ntohs(sin.sin_port);
+
+	return socketEscucha;
+}
+int socket_aceptarCliente(int socketEscucha) {
+	int socketNuevaConexion;
+	unsigned int size_sockAddrIn;
+
+	struct sockaddr_in suSocket;
+
+	size_sockAddrIn = sizeof(struct sockaddr_in);
+	socketNuevaConexion = accept(socketEscucha, (struct sockaddr *) &suSocket,
+			&size_sockAddrIn);
+
+	if (socketNuevaConexion < 0) {
+
+		perror("Error al aceptar conexion entrante");
+		return -1;
+
+	}
+
+	return socketNuevaConexion;
+
 }
 

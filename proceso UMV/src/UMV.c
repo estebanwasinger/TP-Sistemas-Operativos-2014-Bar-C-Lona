@@ -6,6 +6,9 @@
 #include <commons/config.h>
 #include <commons/collections/list.h>
 #include <pthread.h>
+#include <commons/estructurasPackage.h>
+#include <commons/socket.h>.
+#include <commons/package.h>
 
 //Variables Globales de la UMV
 void *memFisica;
@@ -31,8 +34,12 @@ int main(void) {
 	// comienzan a correr los procesos
 	LanzarConsola();
 
+	// comienza a escuchar
+	EscucharYLanzarHilos();
+
 	return EXIT_SUCCESS;
 }
+
 
 /////////////   FIN MAIN  ///////////////////
 
@@ -351,3 +358,15 @@ RangoMemoria  RangoMasGrandeLibre(){
 
 	return mayorRango;
 }
+
+void EscucharYLanzarHilos(){
+
+	int servidorKernel = socket_crearServidor("127.0.0.1",5000);
+	int nuevaConeccion = socket_aceptarCliente(servidorKernel);
+
+//	t_header * header;
+//	memcpy(header, unStream.data, sizeof(t_header));
+//	int tipEstructura = header->tipoEstructura;
+
+}
+

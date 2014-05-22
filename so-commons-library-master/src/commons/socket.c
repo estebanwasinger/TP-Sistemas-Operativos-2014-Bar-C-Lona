@@ -543,8 +543,6 @@ int socket_recibir(int socketEmisor, t_tipoEstructura * tipoEstructura, void** e
 }
 
 
-
-
 char* socket_ip(char* direccionCompleta){
 	char * dir = string_duplicate(direccionCompleta);
 	string_append(&dir,"basura"); // Le agrego al final cualquier cosa, cuestion de que si me mandan "127.0.0.1:", pueda dividirlo correctamente...
@@ -565,48 +563,7 @@ char* socket_unirDireccion(char* ip, int puerto){
 	return string_from_format("%s:%d", ip, puerto);
 }
 
-int socket_enviarSignal(int socketReceptor, t_signal signal){
-	t_struct_signal *structSignal = malloc(sizeof(t_struct_signal));
 
-	structSignal->signal = signal;
-
-	int seEnvio = socket_enviar(socketReceptor, D_STRUCT_SIGNAL, (void*)structSignal);
-
-	free(structSignal);
-	return seEnvio;
-}
-
-int socket_recibirSignal(int socketEmisor, t_signal *signal){
-	void * estructuraRecibida;
-	t_tipoEstructura tipoRecibido;
-
-	int recibio = socket_recibir(socketEmisor,&tipoRecibido, &estructuraRecibida);
-	if(!recibio) {
-		*signal = S_ERROR;
-		return 0;
-	}
-
-	if (tipoRecibido != D_STRUCT_SIGNAL){
-		*signal = S_ERROR;
-		return 0;
-	}
-
-	*signal = ((t_struct_signal*) estructuraRecibida)->signal;
-	free(estructuraRecibida);
-	return 1;
-}
-
-/*
- * Nombre: socket_cerrarConexion/3
- *
- * Argumentos:
- * 		- socket
- *
- * Devuelve:
- * 		int (-1-> si se cerro ok, 0-> si hubo problemas).
- *
- * Funcion: recibir y despaquetizar, convierte el paquete recibido a la estructura que corresponda.
- */
 int socket_cerrarConexion(int socket){
 	return close(socket);
 }

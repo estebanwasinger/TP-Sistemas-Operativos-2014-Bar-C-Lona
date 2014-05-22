@@ -28,6 +28,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_NOMBREMENSAJE:
 				paquete = paquetizarStruct_nombreMensaje((t_struct_nombreMensaje *) estructuraOrigen);
 				break;
+			case D_STRUCT_HANDSHAKEUMV:
+				paquete = paquetizarStruct_handshakeUMV((t_struct_handshakeUMV *) estructuraOrigen);
+				break;
 		}
 
 
@@ -62,6 +65,33 @@ t_stream * paquetizarStruct_nombreMensaje(t_struct_nombreMensaje * estructuraOri
 	memcpy(data + tamanoTotal, estructuraOrigen->mensaje, tamanoDato = strlen(estructuraOrigen->mensaje)+1);		//copio a data el mensaje.
 
 	tamanoTotal += tamanoDato;
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+/*
+ * Nombre: paquetizarStruct_handshakeUMV/1
+ * EJEMPLO PAQUETIZAR ESTRUCTURA HANDSHAKE
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(0, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+
+t_stream * paquetizarStruct_handshakeUMV(t_struct_handshakeUMV * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(estructuraOrigen->tipo);
+
+	char * data = crearDataConHeader(D_STRUCT_HANDSHAKEUMV, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(estructuraOrigen));		//copio a data el int
 
 	paquete->data = data;
 
@@ -137,6 +167,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_NOMBREMENSAJE:
 				estructuraDestino = despaquetizarStruct_nombreMensaje(dataPaquete, length);
 				break;
+			case D_STRUCT_HANDSHAKEUMV:
+				estructuraDestino = despaquetizarStruct_handshakeUMV(dataPaquete, length);
+				break;
 		
 		}
 
@@ -176,6 +209,16 @@ t_struct_nombreMensaje * despaquetizarStruct_nombreMensaje(char * dataPaquete, u
 
 	return estructuraDestino;
 }
+
+t_struct_handshakeUMV * despaquetizarStruct_handshakeUMV(char * dataPaquete, uint16_t length){
+	t_struct_handshakeUMV * estructuraDestino = malloc(sizeof(t_struct_handshakeUMV));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_handshakeUMV)); //copio el data del paquete a la estructura
+
+	return estructuraDestino;
+}
+
+
 
 /*
  * Nombre: despaquetizarHeader/1

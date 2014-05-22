@@ -58,8 +58,6 @@ int epoll_escucharGeneralTimeOut(int epollfd, int uniqueSocket, void(*uniqueHand
 int socket_enviar(int socketReceptor, t_tipoEstructura tipoEstructura, void* estructura);
 int socket_recibir(int socketEmisor, t_tipoEstructura * tipoEstructura, void** estructura);
 
-int socket_enviarSignal(int socketReceptor, t_signal signal);
-int socket_recibirSignal(int socketEmisor, t_signal *signal);
 
 int socket_cerrarConexion(int socket);
 

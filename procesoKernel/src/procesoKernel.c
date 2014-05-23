@@ -23,9 +23,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <commons/socket.h>
-#include <commons/estructurasPackage.h>
-#include <commons/package.h>
+#include "socket.h"
+#include "estructurasPackage.h"
+#include "package.h"
 
 pthread_t hiloPLP;
 pthread_t hiloPCP;
@@ -97,7 +97,7 @@ void* mainPLP() {
 	int socketPLP;
 	int socketPLPEscucha;
 	//int nbytesRecibidos;
-	t_struct_handshakeUMV soyKernel;
+//	t_struct_handshakeUMV soyKernel;
 
 	t_tipoEstructura * tipoHandshake = malloc(1);
 	*tipoHandshake = 3;

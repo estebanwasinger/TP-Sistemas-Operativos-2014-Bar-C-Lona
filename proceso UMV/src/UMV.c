@@ -6,9 +6,9 @@
 #include <commons/config.h>
 #include <commons/collections/list.h>
 #include <pthread.h>
-#include <commons/estructurasPackage.h>
-#include <commons/socket.h>.
-#include <commons/package.h>
+#include "socket.h"
+#include "estructurasPackage.h"
+#include "package.h"
 
 //Variables Globales de la UMV
 void *memFisica;

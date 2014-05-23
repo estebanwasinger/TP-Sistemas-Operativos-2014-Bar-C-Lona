@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lsocket_library -lparser-ansisop -lcommons
+LIBS := -lpruebaShared -lsocket_library -lparser-ansisop -lcommons
 

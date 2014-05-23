@@ -11,9 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <commons/socket.h>
-#include <commons/estructurasPackage.h>
-#include <commons/package.h>
 #include <commons/config.h>
 #include <commons/log.h>
 #include <commons/string.h>
@@ -30,6 +27,9 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include "socket.h"
+#include "estructurasPackage.h"
+#include "package.h"
 
 
 #define DIRECCION "127.0.0.1"

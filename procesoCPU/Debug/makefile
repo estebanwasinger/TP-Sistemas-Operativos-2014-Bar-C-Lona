@@ -26,13 +26,13 @@ endif
 all: procesoCPU
 
 dependents:
-	-cd /home/utnso/workspace/socket_library/Debug && $(MAKE) all
+	-cd /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug && $(MAKE) clean all
 
 # Tool invocations
-procesoCPU: $(OBJS) $(USER_OBJS) /home/utnso/workspace/socket_library/Debug/libsocket_library.so
+procesoCPU: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/workspace/socket_library/Debug" -o "procesoCPU" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug" -o "procesoCPU" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -43,6 +43,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/utnso/workspace/socket_library/Debug/libsocket_library.so:
+/home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so:
 
 -include ../makefile.targets

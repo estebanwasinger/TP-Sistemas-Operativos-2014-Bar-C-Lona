@@ -18,7 +18,9 @@
 #include <parser/metadata_program.h>
 #include <parser/parser.h>
 #include <stdint.h>
-#include <socket.h>
+#include "socket.h"
+#include "estructurasPackage.h"
+#include "package.h"
 
 int Puerto_Kernel;
 int Puerto_UMV;

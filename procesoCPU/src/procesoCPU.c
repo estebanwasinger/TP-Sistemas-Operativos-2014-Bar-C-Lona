@@ -14,13 +14,22 @@
 #include <commons/config.h>
 #include <commons/log.h>
 #include <commons/string.h>
-#include "CPU.h"
+#include <commons/collections/dictionary.h>
+#include <parser/metadata_program.h>
+#include <parser/parser.h>
+#include <stdint.h>
+#include <socket.h>
 
 int Puerto_Kernel;
 int Puerto_UMV;
 char * IP_Kernel;
 char * IP_UMV;
 t_log * logger;
+t_PCB * unPcb;
+t_dictionary * dicc_variables;
+
+int conf_es_valida(t_config * configuracion);
+t_puntero definirVariable(t_nombre_variable * identificador_variable);
 
 int main(int argc, char **argv) {
 
@@ -28,6 +37,7 @@ t_config * configuracion;
 char * temp_IP_Kernel;
 char * temp_IP_UMV;
 char * log_name;
+
 
    log_name = malloc(strlen("CPU")+1);
    strcpy(log_name, "CPU");
@@ -61,18 +71,40 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 
 	log_info(logger,"EL ARCHIVO DE CONFIGURACION SE LEVANTO CORRECTAMENTE");
 
-	printf("Puerto_k=%d\n", Puerto_Kernel); //imprime por pantalla el puerto
-	printf("Puerto_U=%d\n", Puerto_UMV); //imprime por pantalla el puerto
+	//----------------termino archivo de configuracion--------------------//
 
-	printf("IP_K=%s\n", IP_Kernel);     //imprime por pantalla la IP
-	printf("IP_K=%s\n", IP_UMV);     //imprime por pantalla la IP
+	//conectarse_kernel();
 
-	printf("\n");
+while(1){
 
+//el PCB que recibo lo tengo que asignar a la variable unPcb global.
+//if(recibir_pcb()==1;
+
+
+	unPcb=malloc(sizeof(unPcb));
+
+	unPcb->Id=435;
+    unPcb->cursor_stack =0X45;
+    unPcb->indice_codigo=0X67;
+    unPcb->seg_stack="a";
+	unPcb->indice_etiquetas=0X23;
+	unPcb->program_counter=0;
+	unPcb->seg_codigo=0X234;
+	unPcb->size_contexto_actual=34;
+	unPcb->size_indice_etiquetas=0X56;
+
+
+ dicc_variables =dictionary_create(); // este el diccinario de las variables del programa.
+
+
+
+}
 
 	return 0;
 
+
 }
+
 
 int conf_es_valida(t_config * configuracion) // verifica que el arch de conf tenga los datos correctos
 {
@@ -80,5 +112,21 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 			&& config_has_property(configuracion, "Puerto_UMV")
 			&& config_has_property(configuracion, "Ip_kernel")
 			&& config_has_property(configuracion, "Ip_UMV"));
+
+}
+
+
+
+t_puntero definirVariable(t_nombre_variable  identificador_variable){
+	memcpy(unPcb->seg_stack ,identificador_variable ,sizeof(t_nombre_variable)+sizeof(t_valor_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
+	//asegurarme que identificador_variable sea dianmico.
+    dictionary_put(dicc_variables,identificador_variable,unPcb->seg_stack);
+    return unPcb+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
+
+}
+
+
+t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
+
 
 }

@@ -3,6 +3,7 @@
 	<name>procesoCPU</name>
 	<comment></comment>
 	<projects>
+		<project>socket_library</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

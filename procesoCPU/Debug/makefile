@@ -25,11 +25,14 @@ endif
 # All Target
 all: procesoCPU
 
+dependents:
+	-cd /home/utnso/workspace/socket_library/Debug && $(MAKE) all
+
 # Tool invocations
-procesoCPU: $(OBJS) $(USER_OBJS)
+procesoCPU: $(OBJS) $(USER_OBJS) /home/utnso/workspace/socket_library/Debug/libsocket_library.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "procesoCPU" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/socket_library/Debug" -o "procesoCPU" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -40,5 +43,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
+/home/utnso/workspace/socket_library/Debug/libsocket_library.so:
 
 -include ../makefile.targets

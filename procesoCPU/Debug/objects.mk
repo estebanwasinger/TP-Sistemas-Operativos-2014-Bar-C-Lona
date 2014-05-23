@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lparser-ansisop -lcommons
+LIBS := -lsocket_library -lparser-ansisop -lcommons
 

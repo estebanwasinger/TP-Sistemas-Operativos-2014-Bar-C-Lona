@@ -13,17 +13,6 @@ void imprimirMetadata();
 void* mainPLP();
 void* mainPCP();
 
-//FUNCIONES PARA EL CLIENTE
-int socket_crearCliente(void);
-int socket_conectarCliente(int sockfd,char *serverIp, int serverPort);
-int socket_crearYConectarCliente(char *serverIp, int serverPort);
-
-//FUNCIONES PARA EL SERVIDOR
-int socket_crearServidor(char *ip, int port);
-int socket_crearServidorPuertoRandom(char *ip, int * port);
-int socket_aceptarCliente(int socketEscucha);
-
-
 typedef struct PCB {
     int ID;
     int SEG_CODIGO;

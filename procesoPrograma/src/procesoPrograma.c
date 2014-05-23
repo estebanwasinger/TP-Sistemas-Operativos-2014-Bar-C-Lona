@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <commons/socket.h>
+#include <commons/estructurasPackage.h>
+#include <commons/package.h>
 #include <commons/config.h>
 #include <commons/log.h>
 #include <commons/string.h>
@@ -27,6 +30,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+
 
 #define DIRECCION "127.0.0.1"
 #define PUERTO 5000
@@ -89,13 +93,18 @@ int main(int argc, char** argv) {
 	//**********************************//
 	//	   Leectura y envio de codigo	//
 	//**********************************//
+	t_struct_handshakeUMV soyKernel;
+
+
 
 	file = abrir_archivoRO(argv);
-	int size = size_archivo(file);
-	char* codigo = leer_codAnsisop(file);
+//	int size = size_archivo(file);
+	//char* codigo = leer_codAnsisop(file);
+	//socket_enviar(socketKernel,D_STRUCT_HANDSHAKEUMV,);
+	socket_enviar(socketKernel,3,&soyKernel);
 
-	send(socketKernel, codigo, size, 0);
-	send(socketKernel,"fin",3,0);
+//	send(socketKernel, codigo, size, 0);
+//	send(socketKernel,"fin",3,0);
 
 	close(socketKernel);
 	return EXIT_SUCCESS;

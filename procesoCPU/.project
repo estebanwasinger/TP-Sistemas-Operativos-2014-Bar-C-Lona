@@ -3,7 +3,6 @@
 	<name>procesoCPU</name>
 	<comment></comment>
 	<projects>
-		<project>socket_library</project>
 		<project>pruebaShared</project>
 	</projects>
 	<buildSpec>

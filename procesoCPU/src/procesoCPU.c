@@ -18,20 +18,18 @@
 #include <parser/metadata_program.h>
 #include <parser/parser.h>
 #include <stdint.h>
-#include "socket.h"
-#include "estructurasPackage.h"
-#include "package.h"
+
 
 int Puerto_Kernel;
 int Puerto_UMV;
 char * IP_Kernel;
 char * IP_UMV;
 t_log * logger;
-t_PCB * unPcb;
+//t_PCB * unPcb;
 t_dictionary * dicc_variables;
 
 int conf_es_valida(t_config * configuracion);
-t_puntero definirVariable(t_nombre_variable * identificador_variable);
+//t_puntero definirVariable(t_nombre_variable * identificador_variable);
 
 int main(int argc, char **argv) {
 
@@ -39,7 +37,7 @@ t_config * configuracion;
 char * temp_IP_Kernel;
 char * temp_IP_UMV;
 char * log_name;
-
+int nuevo_socket;
 
    log_name = malloc(strlen("CPU")+1);
    strcpy(log_name, "CPU");
@@ -53,7 +51,7 @@ if (argc != 2) //controlar que haya exactamente un parámetro
 		puts("Uso: programa <arch.conf>\n");
 		return -1;  // esto me saca inmediatamente del main ?
 	}
-
+//----------------leo el archivo de configuracion-----------------//
 configuracion = config_create(argv[1]);
 
 if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
@@ -75,25 +73,26 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 
 	//----------------termino archivo de configuracion--------------------//
 
-	//conectarse_kernel();
+
+	socket_crearYConectarCliente(IP_Kernel,Puerto_Kernel); // se conecta al kernel
 
 while(1){
 
-//el PCB que recibo lo tengo que asignar a la variable unPcb global.
-//if(recibir_pcb()==1;
+//unPcb = recibir_PCB();
+//unPcb->cursor_stack=unPcb->cursor_stack+1;
 
 
-	unPcb=malloc(sizeof(unPcb));
-
-	unPcb->Id=435;
-    unPcb->cursor_stack =0X45;
-    unPcb->indice_codigo=0X67;
-    unPcb->seg_stack="a";
-	unPcb->indice_etiquetas=0X23;
-	unPcb->program_counter=0;
-	unPcb->seg_codigo=0X234;
-	unPcb->size_contexto_actual=34;
-	unPcb->size_indice_etiquetas=0X56;
+//	unPcb=malloc(sizeof(unPcb));
+//
+//	unPcb->Id=435;
+//    unPcb->cursor_stack =0X45;
+//    unPcb->indice_codigo=0X67;
+//    unPcb->seg_stack="a";
+//	unPcb->indice_etiquetas=0X23;
+//	unPcb->program_counter=1;
+//	unPcb->seg_codigo=0X234;
+//	unPcb->size_contexto_actual=34;
+//	unPcb->size_indice_etiquetas=0X56;
 
 
  dicc_variables =dictionary_create(); // este el diccinario de las variables del programa.
@@ -119,16 +118,16 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 
 
 
-t_puntero definirVariable(t_nombre_variable  identificador_variable){
-	memcpy(unPcb->seg_stack ,identificador_variable ,sizeof(t_nombre_variable)+sizeof(t_valor_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
-	//asegurarme que identificador_variable sea dianmico.
-    dictionary_put(dicc_variables,identificador_variable,unPcb->seg_stack);
-    return unPcb+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
-
-}
-
-
-t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
-
-
-}
+//t_puntero definirVariable(t_nombre_variable  identificador_variable){
+//	memcpy(unPcb->seg_stack ,identificador_variable ,sizeof(t_nombre_variable)+sizeof(t_valor_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
+//	//asegurarme que identificador_variable sea dianmico.
+//    dictionary_put(dicc_variables,identificador_variable,unPcb->seg_stack);
+//    return unPcb+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
+//
+//}
+//
+//
+//t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
+//
+//
+//}

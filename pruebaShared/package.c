@@ -161,6 +161,32 @@ t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen){
 }
 
 /*
+ * Nombre: paquetizarStruct_handshake_umv/1
+ * Argumentos:
+ * 		- estructuraOrigen
+ *
+ * Devuelve:
+ * 		paquete (buffer con la estructura paquetizada).
+ *
+ * Funcion: crearDataConHeader(1, length) -> reserva la memoria para el data del paquete, y le agrega el header.
+ */
+t_stream * paquetizarStruct_handshake_umv(t_struct_handshake_umv * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(unsigned int);
+
+	char * data = crearDataConHeader(D_STRUCT_HANDSHAKE_UMV, paquete->length); //creo el data
+
+	memcpy(data + sizeof(t_header), estructuraOrigen, sizeof(t_struct_handshake_umv)); //copio a data el numero.
+
+	paquete->data = data;
+
+	return paquete;
+}
+
+
+/*
  * Nombre: paquetizarStruct_signal/1
  * Argumentos:
  * 		- estructuraOrigen
@@ -215,17 +241,6 @@ char * crearDataConHeader(uint8_t tipoEstructura, int length){
 
 
 /*
- * Nombre: paquetizarStruct_recursosAsignadosYSobrantes/1
- * Argumentos:
- * 		- estructuraOrigen
- *
- * Devuelve:
- * 		paquete (buffer con la estructura paquetizada).
- *
- * Funcion: crearDataConHeader(15, length) -> reserva la memoria para el data del paquete, y le agrega el header.
- */
-
-/*
  * Nombre: crearHeader/2
  * Argumentos:
  * 		- tipoEstructura
@@ -241,6 +256,8 @@ t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos){
 	header.length = lengthDatos;
 	return header;
 }
+
+
 
 /******************** DESPAQUETIZAR *************************/
 
@@ -331,6 +348,26 @@ t_struct_nombreMensaje * despaquetizarStruct_nombreMensaje(char * dataPaquete, u
 
 t_struct_numero * despaquetizarStruct_numero(char * dataPaquete, uint16_t length){
 	t_struct_numero * estructuraDestino = malloc(sizeof(t_struct_numero));
+
+	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
+
+	return estructuraDestino;
+}
+
+/*
+ * Nombre: despaquetizarStruct_handshake_umv/2
+ * Argumentos:
+ * 		- char * dataPaquete
+ * 		- length
+ *
+ * Devuelve:
+ * 		una estructura de tipo D_STRUCT_HANDSHAKE_UMV.
+ *
+ * Funcion: Según el tipo de estructura, va a distintas funciones que las despaquetizan.
+ */
+
+t_struct_handshake_umv * despaquetizarStruct_handshake_umv(char * dataPaquete, uint16_t length){
+	t_struct_handshake_umv * estructuraDestino = malloc(sizeof(t_struct_handshake_umv));
 
 	memcpy(estructuraDestino, dataPaquete, sizeof(unsigned int)); //copio el data del paquete a la estructura.
 

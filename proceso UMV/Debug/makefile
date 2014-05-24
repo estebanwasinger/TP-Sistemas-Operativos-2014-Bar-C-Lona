@@ -27,9 +27,10 @@ all: UMV
 
 dependents:
 	-cd /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug && $(MAKE) clean all
+	-cd /home/utnso/workspace/tp-2014-1c-bar-c-lona/proceso\ UMV/Release && $(MAKE) clean all
 
 # Tool invocations
-UMV: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so
+UMV: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so /home/utnso/workspace/tp-2014-1c-bar-c-lona/proceso\ UMV/Release/UMV
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc -L"/home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug" -o "UMV" $(OBJS) $(USER_OBJS) $(LIBS)
@@ -44,5 +45,6 @@ clean:
 .PHONY: all clean dependents
 .SECONDARY:
 /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so:
+/home/utnso/workspace/tp-2014-1c-bar-c-lona/proceso\ UMV/Release/UMV:
 
 -include ../makefile.targets

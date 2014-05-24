@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>pruebaShared</project>
+		<project>UMV</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

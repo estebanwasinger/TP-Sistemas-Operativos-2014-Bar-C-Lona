@@ -40,6 +40,9 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_SIGNAL:
 				paquete = paquetizarStruct_signal((t_struct_signal *) estructuraOrigen);
 				break;
+			case D_STRUCT_HANDSHAKE_UMV:
+				paquete = paquetizarStruct_handshake_umv((t_struct_handshake_umv *) estructuraOrigen);
+				break;
 
 		}
 
@@ -293,6 +296,9 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 				break;
 			case D_STRUCT_CHAR:
 				estructuraDestino = despaquetizarStruct_char(dataPaquete, length);
+				break;
+			case D_STRUCT_HANDSHAKE_UMV:
+				estructuraDestino = despaquetizarStruct_handshake_umv(dataPaquete, length);
 				break;
 		}
 

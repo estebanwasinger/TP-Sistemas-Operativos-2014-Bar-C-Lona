@@ -1,12 +1,5 @@
-package.d: ../package.c ../package.h ../string.h ../estructurasPackage.h \
- ../collections/list.h ../collections/node.h
+package.d: ../package.c ../package.h ../estructurasPackage.h
 
 ../package.h:
 
-../string.h:
-
 ../estructurasPackage.h:
-
-../collections/list.h:
-
-../collections/node.h:

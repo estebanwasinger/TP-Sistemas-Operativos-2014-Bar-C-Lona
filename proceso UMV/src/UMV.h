@@ -6,6 +6,9 @@
 #include <commons/config.h>
 #include <commons/collections/list.h>
 #include <pthread.h>
+#include <socket.h>
+#include <estructurasPackage.h>
+#include <package.h>
 
 //Definicion de Structss
 typedef struct{
@@ -32,6 +35,7 @@ void Grabar(int posMem, void * element);
 void * Consultar(int posMem);
 void GrabarSegmento(char* programa, int tamanoSegmento);
 void ManejoKernel(int coneccion);
+void MostrarRangosMemoriaLibre();
 
 
 //Firmas funciones Int

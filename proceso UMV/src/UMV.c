@@ -1,15 +1,4 @@
 #include"UMV.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/collections/list.h>
-#include <pthread.h>
-#include <socket.h>
-#include <estructurasPackage.h>
-#include <package.h>
 
 // Variables Globales de la UMV
 void *MemFisica;
@@ -39,15 +28,79 @@ int main(void) {
 	// comienza a escuchar
 	// EscucharYLanzarHilos();
 
-	printf("Cantidad Mem Libre %d \n", CantidadMemoriaLibre());
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
 
-	GrabarSegmento("prog1 ", 100);
+	GrabarSegmento("prog1 ", 1000);
 
-	printf("Cantidad Mem Libre %d \n", CantidadMemoriaLibre());
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+	Segmento aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
 
-	GrabarSegmento("prog1", 100);
 
-	printf("Cantidad Mem Libre %d \n", CantidadMemoriaLibre());
+	MostrarRangosMemoriaLibre();
+
+
+	printf("\n\n");
+	GrabarSegmento("prog1", 1800);
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+	 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+	printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+	MostrarRangosMemoriaLibre();
+
+	printf("\n\n");
+	GrabarSegmento("prog1", 1300);
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+	 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+	printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+	printf("3 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+	MostrarRangosMemoriaLibre();
+
+	printf("\n\n");
+	GrabarSegmento("prog1", 1200);
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+
+	 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+	printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+	printf("3 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 3));
+	printf("4 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+	MostrarRangosMemoriaLibre();
+
+	printf("\n\n");
+	GrabarSegmento("prog1", 800);
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+
+	 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+	printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+	printf("3 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 3));
+	printf("4 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 4));
+	printf("5 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+	MostrarRangosMemoriaLibre();
+
+	printf("\n\n");
+	printf("Cantidad Segmentos Hasta el momento %d \n\n", (int)list_size(Segmentos_UMV));
+
+
+	printf("\n\n");
+
+
 
 
 	return EXIT_SUCCESS;
@@ -116,7 +169,7 @@ void Consola() {
 	}
 }
 
-// crea un segmento nuevo
+// crea un segmento nuevo -- OK
 Segmento *create_segmento(char* programa, void* base, int base_virtual,
 		int tamano) {
 	Segmento *segmento_nuevo = malloc(sizeof(Segmento));
@@ -128,7 +181,7 @@ Segmento *create_segmento(char* programa, void* base, int base_virtual,
 	return segmento_nuevo;
 }
 
-// crea un rango de memoria
+// crea un rango de memoria --OK
 RangoMemoria *create_rango_mem(int base, int tamano) {
 	RangoMemoria *aRango = malloc(sizeof(RangoMemoria));
 	aRango->base = base;
@@ -152,7 +205,6 @@ int EjecutarComandos(t_list *lista_comandos) {
 	printf("No se encuentra el comando o alguno de los parametros es invalido");
 	return 0;
 }
-
 
 // Elije una base aleatoria y graba el segmento segun el algoritmo indicado
 void GrabarSegmento(char* programa, int tamano_Segmento) {
@@ -186,7 +238,7 @@ void GrabarSegmento(char* programa, int tamano_Segmento) {
 	}
 }
 
-// guarda el un nuevo segmento ordenado por su base en lista de segmentos
+// guarda el un nuevo segmento ordenado por su base en lista de segmentos -- OK
 int GuardarNuevoSegmentoOrdenado(char* programa, int base_virtual, int tamano) {
 	Segmento * nuevo_segmento = create_segmento(programa,
 			(MemFisica + base_virtual), base_virtual, tamano);
@@ -197,9 +249,13 @@ int GuardarNuevoSegmentoOrdenado(char* programa, int base_virtual, int tamano) {
 	}
 	else {   // si no esta vacia agregamos ordenado por la baseVirtual
 		int pos = 0;
-		while (list_size(Segmentos_UMV) - 1 != pos && ((Segmento*) list_get(Segmentos_UMV, pos))->baseVirtual > base_virtual) // vamos a la posicion donde este ordenado
+		Segmento aSeg = *((Segmento*) list_get(Segmentos_UMV, pos));
+		while (list_size(Segmentos_UMV) > pos && aSeg.baseVirtual < base_virtual) // vamos a la posicion donde este ordenado
 		{
 			pos++;
+			if(pos != list_size(Segmentos_UMV)){
+				aSeg = *((Segmento*) list_get(Segmentos_UMV, pos));
+			}
 		}
 
 		list_add_in_index(Segmentos_UMV, pos, nuevo_segmento);
@@ -207,7 +263,7 @@ int GuardarNuevoSegmentoOrdenado(char* programa, int base_virtual, int tamano) {
 	}
 }
 
-// Permite el cambio de FirstFit a WorstFit
+// Permite el cambio de FirstFit a WorstFit -- OK
 void CambiarAlgoritmo(char* nombre_algoritmo) {
 	if (string_equals_ignore_case("firstfit", nombre_algoritmo)) {
 		AlgoritmoActual = ALGOTIRMO_FIRSTFIT;
@@ -252,6 +308,19 @@ int CantidadMemoriaLibre() {
 	return tamanoTotal;
 }
 
+void MostrarRangosMemoriaLibre() {
+
+	void ContarTamano(RangoMemoria* rango) {
+		 printf("Rango: Base %d , Tam: %d \n", rango->base, rango->tamano);
+	}
+
+	t_list* rangosLibres = RangosLibresDeMemoria();
+
+	list_iterate(rangosLibres, (void*)ContarTamano);
+
+}
+
+
 // Nos devuelve un array de RangosDeMemoria con todos los rangos de memoria libres;
 t_list *RangosLibresDeMemoria() {
 	int pos = 0;
@@ -294,10 +363,10 @@ t_list *RangosLibresDeMemoria() {
 
 	// Ultimo segmento a analizar
 	Segmento ultimoSegmento = *((Segmento*) list_get(Segmentos_UMV, pos));
-	llegada = ultimoSegmento.baseVirtual + ultimoSegmento.tamano;
+	salida = ultimoSegmento.baseVirtual + ultimoSegmento.tamano;
 
-	if (MemTotal > llegada) { // si no esta tocando el final de nuestra memoria
-		rangoMem = create_rango_mem(salida, MemTotal - llegada);
+	if (MemTotal > salida) { // si no esta tocando el final de nuestra memoria
+		rangoMem = create_rango_mem(salida, MemTotal - salida);
 		list_add(rangos_de_memoria, rangoMem);
 	}
 
@@ -364,7 +433,7 @@ int EnviarBytes(int base, int offset, int tamano){
 	return 1;
 }
 
-// Nos devuelve la pos del rango de mayor tamaño
+// Nos devuelve la pos del rango de mayor tamaño -- OK
 RangoMemoria RangoMasGrandeLibre() {
 	int pos = 0;
 	int mayorTamano;

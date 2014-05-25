@@ -23,9 +23,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
-#include "socket.h"
-#include "estructurasPackage.h"
-#include "package.h"
+#include <socket.h>
+#include <package.h>
+#include <estructurasPackage.h>
 
 pthread_t hiloPLP;
 pthread_t hiloPCP;
@@ -92,24 +92,32 @@ void imprimirMetadata(t_medatada_program* metadata) {
 
 
 void* mainPLP() {
+
 	printf("Hola soy el PLP\n\n");
-	//char buffer[1024];
+
 	int socketPLP;
 	int socketPLPEscucha;
-	//int nbytesRecibidos;
-//	t_struct_handshakeUMV soyKernel;
 
-	t_tipoEstructura * tipoHandshake = malloc(1);
-	*tipoHandshake = 3;
-	void *puntero = &soyKernel;
-	socketPLP = socket_crearServidor("127.0.0.1",5000);
-	socketPLPEscucha = socket_aceptarCliente(socketPLP);
-	int ret = socket_recibir(socketPLPEscucha,tipoHandshake,puntero);
-	printf("RETT %d",ret);
+	socketPLP= socket_crearServidor("127.0.0.1", 5000);
+	socketPLPEscucha= socket_aceptarCliente(socketPLP);
+	void * codigoAnsisop;
+	t_tipoEstructura tipoEstructura;
 
-printf("\n Recibido: %d\n",soyKernel.tipo);
-	close(socketPLP);
-	close(socketPLPEscucha);
+	socket_recibir(socketPLPEscucha,&tipoEstructura,&codigoAnsisop);
+
+	char* codigoAnsisopLiteral =(((t_struct_string*)codigoAnsisop)->string);
+	t_medatada_program * metadata;
+	metadata = metadatada_desde_literal(codigoAnsisopLiteral);
+
+
+
+
+
+	int socketUMV = socket_crearCliente();
+	socket_conectarCliente(socketUMV,"127.0.0.1",4000);
+
+
+
 
 	return 0;
 }

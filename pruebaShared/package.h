@@ -29,6 +29,7 @@ t_stream * paquetizarStruct_char(t_struct_char * estructuraOrigen); //E
 t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen); //D
 t_stream * paquetizarStruct_handshake_umv(t_struct_handshake_umv * estructuraOrigen);
 t_stream * paquetizarStruct_signal(t_struct_signal * estructuraOrigen); //E
+t_stream * paquetizarStruct_pcb(t_struct_pcb * estructuraOrigen);
 
 // ---------------------------------------------------------------------------
 
@@ -47,6 +48,7 @@ t_struct_char * despaquetizarStruct_char(char * dataPaquete, uint16_t length);
 t_struct_string * despaquetizarStruct_string(char * dataPaquete, uint16_t length);
 t_struct_handshake_umv * despaquetizarStruct_handshake_umv(char * dataPaquete, uint16_t length);
 t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length);
+t_struct_pcb * despaquetizarStruct_pcb(char * dataPaquete, uint16_t length);
 
 // ---------------------------------------------------------------------------
 

@@ -50,6 +50,7 @@
 #define D_STRUCT_STRING 3
 #define D_STRUCT_HANDSHAKE_UMV 4
 #define D_STRUCT_SIGNAL 5
+#define D_STRUCT_PCB 6
 
 
 //Estructura auxiliar de stream
@@ -107,6 +108,20 @@ typedef unsigned int t_signal;
 typedef struct struct_signal {
 	t_signal signal;
 } __attribute__ ((__packed__)) t_struct_signal;
+
+/*Estructura tipo STRUCT_PCB(6)
+ *va a enviar la estructura de un pcb
+ */
+typedef struct struct_pcb {
+	uint32_t iD;
+	uint32_t seg_codigo;
+	uint32_t seg_stack;
+	uint32_t indice_codigo;
+	uint32_t indice_etiquetas;
+	uint32_t programa_counter;
+
+} __attribute__ ((__packed__)) t_struct_pcb;
+
 
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

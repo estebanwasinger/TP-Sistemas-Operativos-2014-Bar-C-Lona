@@ -1,0 +1,30 @@
+	GrabarSegmento("prog1 ", 1000);
+
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+	Segmento aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+	printf("\n\n");
+	GrabarSegmento("prog1", 1800);
+
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+	aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("PRIMERO Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+	printf("SEGUNDO Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+
+	printf("\n\n");
+	printf("Cantidad Segmentos Hasta el momento %d \n\n", (int)list_size(Segmentos_UMV));
+
+
+	printf("\n\n");
+
+	RangoMemoria ran1 = *((RangoMemoria*) list_get(RangosLibresDeMemoria(),0));
+	ran1 = *((RangoMemoria*) list_get(RangosLibresDeMemoria(),1));
+	ran1 = *((RangoMemoria*) list_get(RangosLibresDeMemoria(),2));
+
+
+	printf("Base: %d, Tam: %d \n", ran1.base,ran1.tamano);
+	printf("Base: %d, Tam: %d \n", ran1.base,ran1.tamano);
+	printf("Base: %d, Tam: %d \n", ran1.base,ran1.tamano);

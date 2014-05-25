@@ -1,0 +1,42 @@
+	GuardarNuevoSegmentoOrdenado("1prog", 3000,1000);
+	GuardarNuevoSegmentoOrdenado("1prog", 300,400);
+	GuardarNuevoSegmentoOrdenado("1prog", 1100,1000);
+	GuardarNuevoSegmentoOrdenado("1prog", 19,100);
+	GuardarNuevoSegmentoOrdenado("1prog", 5000,100);
+	GuardarNuevoSegmentoOrdenado("1prog", 2,12);
+	GuardarNuevoSegmentoOrdenado("1prog", 10000,12);
+	GuardarNuevoSegmentoOrdenado("1prog", 7000,12);
+	GuardarNuevoSegmentoOrdenado("1prog", 5500,12);
+
+
+	printf("\n FINAL -----");
+
+
+	Segmento aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+	printf("PRIMERO Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+	aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+	printf("SEGUNDO Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+
+    aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+	printf("TERCERO Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+		aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 3));
+	printf("CUARTO Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+		aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 4));
+	printf("QUINTO Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+
+	aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 5));
+	printf("SEXTO Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+	aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 6));
+	printf("7 Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+	aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 7));
+	printf("8 Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);
+
+	aSeg3 =  *((Segmento *)list_get(Segmentos_UMV, 8));
+	printf("9 Base: %d, Tam: %d \n", aSeg3.baseVirtual,aSeg3.tamano);

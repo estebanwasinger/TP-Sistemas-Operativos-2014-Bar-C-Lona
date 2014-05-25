@@ -4,40 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../bitarray.c \
-../config.c \
-../error.c \
-../log.c \
 ../package.c \
-../process.c \
-../socket.c \
-../string.c \
-../temporal.c \
-../txt.c 
+../socket.c 
 
 OBJS += \
-./bitarray.o \
-./config.o \
-./error.o \
-./log.o \
 ./package.o \
-./process.o \
-./socket.o \
-./string.o \
-./temporal.o \
-./txt.o 
+./socket.o 
 
 C_DEPS += \
-./bitarray.d \
-./config.d \
-./error.d \
-./log.d \
 ./package.d \
-./process.d \
-./socket.d \
-./string.d \
-./temporal.d \
-./txt.d 
+./socket.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -8,7 +8,7 @@
 #ifndef ESTRUCTURASPACKAGE_H_
 #define ESTRUCTURASPACKAGE_H_
 
-#include "collections/list.h"
+#include  <commons/collections/list.h>
 
 /*Defino las constantes que vamos a necesitar para manejar algunos casos*/
 #define CONST_NUM_KERNEL 1

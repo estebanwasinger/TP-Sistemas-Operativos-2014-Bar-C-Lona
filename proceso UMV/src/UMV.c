@@ -2,40 +2,53 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/collections/list.h>
 #include <pthread.h>
-#include "socket.h"
-#include "estructurasPackage.h"
-#include "package.h"
+#include <socket.h>
+#include <estructurasPackage.h>
+#include <package.h>
 
-//Variables Globales de la UMV
-void *memFisica;
-int memTotal;
-t_list * segmentosUMV;
+// Variables Globales de la UMV
+void *MemFisica;
+int MemTotal;
+t_list * Segmentos_UMV;
 int AlgoritmoActual = 1;
+int FinPrograma = 0;
 
 /////////////   COMIENZO MAIN  ///////////////////
 
 int main(void) {
 	//Inicializamos las cosas
-	segmentosUMV = list_create();
+	Segmentos_UMV = list_create();
 	srand(time(NULL ));
 
 	// Obtenemos la cantidad de memoria y la alocamos
-	memTotal = ObtenerCantidadMemoriaTotal();
-	if (memTotal <= 0) {
+	MemTotal = ObtenerCantidadMemoriaTotal();
+	if (MemTotal <= 0) {
 		printf("Error De Archivo De Config");
 		return -1;
 	}
-	memFisica = malloc(memTotal);
+	MemFisica = malloc(MemTotal);
 
 	// comienzan a correr los procesos
-	LanzarConsola();
+	// LanzarConsola();
 
 	// comienza a escuchar
-	EscucharYLanzarHilos();
+	// EscucharYLanzarHilos();
+
+	printf("Cantidad Mem Libre %d \n", CantidadMemoriaLibre());
+
+	GrabarSegmento("prog1 ", 100);
+
+	printf("Cantidad Mem Libre %d \n", CantidadMemoriaLibre());
+
+	GrabarSegmento("prog1", 100);
+
+	printf("Cantidad Mem Libre %d \n", CantidadMemoriaLibre());
+
 
 	return EXIT_SUCCESS;
 }
@@ -44,7 +57,7 @@ int main(void) {
 
 //------------------ FUNCIONES ------------------------
 
-//lee un archivo de configuracion y trae el tamaño de memoria a alocar
+//lee un archivo de configuracion y trae el tamaño de memoria a alocar --- OK
 int ObtenerCantidadMemoriaTotal() {
 
 	// El archivo de configuracion va en la carpeta raiz del proyecto "proceso UMV"
@@ -62,14 +75,14 @@ int ObtenerCantidadMemoriaTotal() {
 	return cantidadMemoria;
 }
 
-// crea un hilo que maneja la consola
+// crea un hilo que maneja la consola --- OK
 void LanzarConsola() {
 	pthread_t hilo_consola;
 	pthread_create(&hilo_consola, NULL, (void*) Consola, NULL );
 	pthread_join(hilo_consola, NULL );
 }
 
-// maneja consola y controla los comandos ingresados por teclado
+// maneja consola y controla los comandos ingresados por teclado --- OK
 void Consola() {
 	//variables locales
 	char* comando = string_new();
@@ -104,11 +117,11 @@ void Consola() {
 }
 
 // crea un segmento nuevo
-Segmento *create_segmento(char* programa, void* base, int baseVirtual,
+Segmento *create_segmento(char* programa, void* base, int base_virtual,
 		int tamano) {
 	Segmento *segmento_nuevo = malloc(sizeof(Segmento));
 	segmento_nuevo->base = base;
-	segmento_nuevo->baseVirtual = baseVirtual;
+	segmento_nuevo->baseVirtual = base_virtual;
 	segmento_nuevo->programa = programa;
 	segmento_nuevo->tamano = tamano;
 
@@ -125,10 +138,10 @@ RangoMemoria *create_rango_mem(int base, int tamano) {
 }
 
 // Ejecuta los comandos que entran por la consola
-int EjecutarComandos(t_list *listaComandos) {
+int EjecutarComandos(t_list *lista_comandos) {
 	char *nombreFuncion = string_new();
-	int cantidadParams = list_size(listaComandos) - 1;
-	nombreFuncion = (char*) list_get(listaComandos, 0);
+	int cantidadParams = list_size(lista_comandos) - 1;
+	nombreFuncion = (char*) list_get(lista_comandos, 0);
 
 	if (string_equals_ignore_case(nombreFuncion, "compactar")
 			&& cantidadParams == 0) {
@@ -140,36 +153,68 @@ int EjecutarComandos(t_list *listaComandos) {
 	return 0;
 }
 
-// guarda el un nuevo segmento ordenado por su base en lista de segmentos
-int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano) {
-	Segmento * nuevo_segmento = create_segmento(programa,
-			(memFisica + baseVirtual), baseVirtual, tamano);
 
-	if (list_is_empty(segmentosUMV)) { // si la lista esta vacia lo agregamos en la primer posicion
-		list_add(segmentosUMV, nuevo_segmento);
-		return 1;
-	} else {   // si no esta vacia agregamos ordenado por la baseVirtual
+// Elije una base aleatoria y graba el segmento segun el algoritmo indicado
+void GrabarSegmento(char* programa, int tamano_Segmento) {
+
+	if (!SePuedeGrabarSegmento(tamano_Segmento)) {
+		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento");
+		return;
+	}
+
+	// segun el algoritmo se elige una base aleatoria.
+	if (ALGOTIRMO_FIRSTFIT == AlgoritmoActual) {
 		int pos = 0;
-		while (list_size(segmentosUMV) - 1 != pos
-				&& ((Segmento*) list_get(segmentosUMV, pos))->baseVirtual
-						> baseVirtual) // vamos a la posicion donde este ordenado
+		int tamanoRangoLibre = 0;
+		RangoMemoria rango;
+
+		// calculamos el primer rango de memoria en el que entra el segmento
+		while (tamanoRangoLibre < tamano_Segmento) {
+			rango = *((RangoMemoria*)list_get(RangosLibresDeMemoria(), pos));
+			tamanoRangoLibre = rango.tamano;
+			pos++;
+		}
+		// calculamos la base aletoria dentro del rango
+		int base = (rand() % (rango.base + rango.tamano - tamano_Segmento)) + (rango.base);
+		GuardarNuevoSegmentoOrdenado(programa, base, tamano_Segmento);
+
+	} else {
+		RangoMemoria elRangoGrande = RangoMasGrandeLibre();
+		// calculamos la base, es un numero random en el que puede entrar el segmento dentro del mayor rango de memoria libre
+		int base = (rand() % (elRangoGrande.base + elRangoGrande.tamano)) + (elRangoGrande.base + elRangoGrande.tamano - tamano_Segmento);
+		GuardarNuevoSegmentoOrdenado(programa, base, tamano_Segmento);
+	}
+}
+
+// guarda el un nuevo segmento ordenado por su base en lista de segmentos
+int GuardarNuevoSegmentoOrdenado(char* programa, int base_virtual, int tamano) {
+	Segmento * nuevo_segmento = create_segmento(programa,
+			(MemFisica + base_virtual), base_virtual, tamano);
+
+	if (list_is_empty(Segmentos_UMV)) { // si la lista esta vacia lo agregamos en la primer posicion
+		list_add(Segmentos_UMV, nuevo_segmento);
+		return 1;
+	}
+	else {   // si no esta vacia agregamos ordenado por la baseVirtual
+		int pos = 0;
+		while (list_size(Segmentos_UMV) - 1 != pos && ((Segmento*) list_get(Segmentos_UMV, pos))->baseVirtual > base_virtual) // vamos a la posicion donde este ordenado
 		{
 			pos++;
 		}
 
-		list_add_in_index(segmentosUMV, pos, nuevo_segmento);
+		list_add_in_index(Segmentos_UMV, pos, nuevo_segmento);
 		return 1;
 	}
 }
 
 // Permite el cambio de FirstFit a WorstFit
-void CambiarAlgoritmo(char* nombreAlgoritmo) {
-	if (string_equals_ignore_case("firstfit", nombreAlgoritmo)) {
+void CambiarAlgoritmo(char* nombre_algoritmo) {
+	if (string_equals_ignore_case("firstfit", nombre_algoritmo)) {
 		AlgoritmoActual = ALGOTIRMO_FIRSTFIT;
 		printf(" Se a cambiado el algoritmo a FirstFit ");
 		return;
 	}
-	if (string_equals_ignore_case("worstfit", nombreAlgoritmo)) {
+	if (string_equals_ignore_case("worstfit", nombre_algoritmo)) {
 		AlgoritmoActual = ALGOTIRMO_WORSTFIT;
 		printf(" Se a cambiado el algoritmo a WorstFit ");
 		return;
@@ -187,8 +232,7 @@ bool SePuedeGrabarSegmento(int tamano) {
 	int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango) {
 		return rango->tamano >= tamano;
 	}
-	return list_any_satisfy(listaRangosLibres,
-			(void*) Hay_algun_rango_de_tamano_suficiente);
+	return (list_any_satisfy(listaRangosLibres, (void*) Hay_algun_rango_de_tamano_suficiente));
 
 }
 
@@ -203,7 +247,7 @@ int CantidadMemoriaLibre() {
 
 	t_list* rangosLibres = RangosLibresDeMemoria();
 
-	list_iterate(rangosLibres, (void*) ContarTamano);
+	list_iterate(rangosLibres, (void*)ContarTamano);
 
 	return tamanoTotal;
 }
@@ -215,16 +259,26 @@ t_list *RangosLibresDeMemoria() {
 	RangoMemoria *rangoMem;
 	t_list * rangos_de_memoria = list_create();
 
-	if (list_is_empty(segmentosUMV)) {
-		rangoMem = create_rango_mem(0, memTotal);
+	if (list_is_empty(Segmentos_UMV)) {
+		rangoMem = create_rango_mem(0, MemTotal);
 		list_add(rangos_de_memoria, rangoMem);
 		return rangos_de_memoria;
 	}
+	else{
+		// primer segmento a analizar
+		Segmento primerSegmento = *((Segmento*) list_get(Segmentos_UMV, 0));
+		if(primerSegmento.baseVirtual != 0){
+			salida = 0;
+			llegada = primerSegmento.baseVirtual;
+			rangoMem = create_rango_mem(salida, llegada);
+			list_add(rangos_de_memoria, rangoMem);
+		}
+	}
 
-	while (list_size(segmentosUMV) - 1 > pos) {
-		Segmento segmentoAnterior = *((Segmento*) list_get(segmentosUMV, pos));
-		Segmento segmentoPosterior = *((Segmento*) list_get(segmentosUMV,
-				pos + 1));
+	while (list_size(Segmentos_UMV) - 1 > pos) {
+
+		Segmento segmentoAnterior = *((Segmento*) list_get(Segmentos_UMV, pos));
+		Segmento segmentoPosterior = *((Segmento*) list_get(Segmentos_UMV,pos + 1));
 
 		salida = segmentoAnterior.baseVirtual + segmentoAnterior.tamano;
 		llegada = segmentoPosterior.baseVirtual;
@@ -234,14 +288,16 @@ t_list *RangosLibresDeMemoria() {
 			rangoMem = create_rango_mem(salida, llegada - salida);
 			list_add(rangos_de_memoria, rangoMem);
 		}
+
+		pos++;
 	}
 
 	// Ultimo segmento a analizar
-	Segmento ultimoSegmento = *((Segmento*) list_get(segmentosUMV, pos));
-	salida = ultimoSegmento.baseVirtual + ultimoSegmento.tamano;
+	Segmento ultimoSegmento = *((Segmento*) list_get(Segmentos_UMV, pos));
+	llegada = ultimoSegmento.baseVirtual + ultimoSegmento.tamano;
 
-	if (memTotal > salida) { // si no esta tocando el final de nuestra memoria
-		rangoMem = create_rango_mem(salida, memTotal);
+	if (MemTotal > llegada) { // si no esta tocando el final de nuestra memoria
+		rangoMem = create_rango_mem(salida, MemTotal - llegada);
 		list_add(rangos_de_memoria, rangoMem);
 	}
 
@@ -253,16 +309,16 @@ void CompactaMemoria() {
 	int pos = 0;
 	int salida, llegada;
 
-	if (list_is_empty(segmentosUMV)) {
+	if (list_is_empty(Segmentos_UMV)) {
 		printf("No Hay nada que compactar");
 		return;
 	}
 
-	Segmento segPrimero = *((Segmento*) list_get(segmentosUMV, pos));
+	Segmento segPrimero = *((Segmento*) list_get(Segmentos_UMV, pos));
 
 	// Nos traemos el primer segmento a la poscicion 0 si no estaba ahi.
 	if (segPrimero.baseVirtual != 0) {
-		void* baseFisica = memFisica;
+		void* baseFisica = MemFisica;
 		Segmento * segAcomodado = create_segmento(segPrimero.programa,
 				baseFisica, 0, segPrimero.tamano);
 
@@ -270,20 +326,20 @@ void CompactaMemoria() {
 		memcpy(baseFisica, segPrimero.base, segPrimero.tamano);
 
 		//remplazamos el segmento viejo por el modificado
-		list_replace(segmentosUMV, pos, segAcomodado);
+		list_replace(Segmentos_UMV, pos, segAcomodado);
 	}
 
-	while (list_size(segmentosUMV) - 1 > pos && list_size(segmentosUMV) > 1) {
+	while (list_size(Segmentos_UMV) - 1 > pos && list_size(Segmentos_UMV) > 1) {
 
-		Segmento segPrimero = *((Segmento*) list_get(segmentosUMV, pos));
-		Segmento segSegundo = *((Segmento*) list_get(segmentosUMV, pos + 1));
+		Segmento segPrimero = *((Segmento*) list_get(Segmentos_UMV, pos));
+		Segmento segSegundo = *((Segmento*) list_get(Segmentos_UMV, pos + 1));
 		salida = segPrimero.baseVirtual + segPrimero.tamano;
 		llegada = segSegundo.baseVirtual;
 
 		//con esto nos fijamos si hay espacio entre medio de los dos nodos
 		if (salida < (llegada - 1)) {
 			// si estaban separados compactamos
-			void* baseFisica = memFisica + salida + 1;
+			void* baseFisica = MemFisica + salida + 1;
 			Segmento * segAcomodado = create_segmento(segSegundo.programa,
 					baseFisica, salida + 1, segSegundo.tamano);
 
@@ -291,55 +347,21 @@ void CompactaMemoria() {
 			memcpy(baseFisica, segSegundo.base, segSegundo.tamano);
 
 			//remplazamos el segmento viejo por el modificado
-			list_replace(segmentosUMV, pos + 1, segAcomodado);
+			list_replace(Segmentos_UMV, pos + 1, segAcomodado);
 		}
 
 		pos++;
 	}
 }
 
-// graba en la memoria un elemento, en la posicion indicada
-void Grabar(int posMem, void * element) {
-
+// solicita bytes para grabar en memoria
+int SolicitarBytesParaGrabar(int base, int offset, int tamano, int buffer){
+	return 1;
 }
 
-// pide datos
-void * Consultar(int posMem) {
-	return memFisica + posMem;
-}
-
-// Elije una base aleatoria y graba el segmento segun el algoritmo indicado
-void GrabarSegmento(char* programa, int tamanoSegmento) {
-
-	if (!SePuedeGrabarSegmento(tamanoSegmento)) {
-		printf("No hay memoria para grabar el segmento");
-		return;
-	}
-
-	// segun el algoritmo se elige una base aleatoria.
-	if (ALGOTIRMO_FIRSTFIT == AlgoritmoActual) {
-		int pos = 0;
-		int tamanoRangoLibre = 0;
-		RangoMemoria rango;
-
-		// calculamos el primer rango de memoria en el que entra el segmento
-		while (tamanoRangoLibre < tamanoSegmento) {
-			rango = *((RangoMemoria*)list_get(RangosLibresDeMemoria(), pos));
-			tamanoRangoLibre = rango.tamano;
-			pos++;
-		}
-		// calculamos la base aletoria dentro del rango
-		int base = (rand() % (rango.base + rango.tamano))
-				+ (rango.base + rango.tamano - tamanoSegmento);
-		GuardarNuevoSegmentoOrdenado(programa, base, tamanoSegmento);
-
-	} else {
-		RangoMemoria elRangoGrande = RangoMasGrandeLibre();
-		// calculamos la base, es un numero random en el que puede entrar el segmento dentro del mayor rango de memoria libre
-		int base = (rand() % (elRangoGrande.base + elRangoGrande.tamano))
-				+ (elRangoGrande.base + elRangoGrande.tamano - tamanoSegmento);
-		GuardarNuevoSegmentoOrdenado(programa, base, tamanoSegmento);
-	}
+// Envia bytes
+int EnviarBytes(int base, int offset, int tamano){
+	return 1;
 }
 
 // Nos devuelve la pos del rango de mayor tamaño
@@ -363,25 +385,27 @@ RangoMemoria RangoMasGrandeLibre() {
 // Encargado de lanzar hilos de atencion y separarlos segun su funcionalidad
 void EscucharYLanzarHilos() {
 
-	int servidorKernel = socket_crearServidor("127.0.0.1", 5000);
-	if (servidorKernel == -1) {
+	int servidor = socket_crearServidor("127.0.0.1", 5000);
+	if (servidor == -1) {
 		printf("Error Al Crear Servidor UMV. Contactese con servicio tecnico.");
 		return;
 	}
 
 	while (1) {
-		int nuevaConeccion = socket_aceptarCliente(servidorKernel);
-		if (servidorKernel == -1) {
+		int nueva_coneccion = socket_aceptarCliente(servidor);
+		if (servidor == -1) {
 			printf("Error Al Adquirir una nueva coneccion con el servidor UMV. Contactese con servicio tecnico.");
 			return;
 		}
 
 		void * handshake;
-		t_tipoEstructura tipoEstructura;
-		if(socket_recibir(nuevaConeccion,&tipoEstructura, &handshake) == -1){ printf("Error al recibir el tipo de proceso que se conecta.");}
+		t_tipoEstructura tipo_estructura;
+		if(socket_recibir(nueva_coneccion,&tipo_estructura, &handshake) == -1){ printf("Error al recibir el tipo de proceso que se conecta.");}
 
 		if(((t_struct_handshake_umv*)handshake)->tipoProceso == CONST_NUM_KERNEL){
 				printf("es un KERNEL");
+				pthread_t hilo_kernel;
+				pthread_create(&hilo_kernel, NULL, (void*) ManejoKernel, (void*)nueva_coneccion);
 		}
 
 		if(((t_struct_handshake_umv*)handshake)->tipoProceso == CONST_NUM_CPU){
@@ -390,5 +414,12 @@ void EscucharYLanzarHilos() {
 		}
 	}
 
+}
+
+// se encarga de manejar la conneccion con el kernel
+void ManejoKernel(int coneccion){
+	t_tipoEstructura tipo_estructura;
+	void * nuevoSegmento;
+	socket_recibir(coneccion,&tipo_estructura, &nuevoSegmento);
 }
 

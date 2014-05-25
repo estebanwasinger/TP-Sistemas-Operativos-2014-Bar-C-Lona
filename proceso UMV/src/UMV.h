@@ -31,7 +31,8 @@ void ContarTamano(RangoMemoria* rango);
 void Grabar(int posMem, void * element);
 void * Consultar(int posMem);
 void GrabarSegmento(char* programa, int tamanoSegmento);
-int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano);
+void ManejoKernel(int coneccion);
+
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
@@ -39,12 +40,14 @@ int EjecutarComandos(t_list *lista);
 int GuardarNuevoSegmentoOrdenado();
 int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
 int CantidadMemoriaLibre();
+int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano);
 
 
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);
 t_list *RangosLibresDeMemoria();
 RangoMemoria  RangoMasGrandeLibre();
+bool SePuedeGrabarSegmento(int tamano);
 
 
 //Variables Estaticas

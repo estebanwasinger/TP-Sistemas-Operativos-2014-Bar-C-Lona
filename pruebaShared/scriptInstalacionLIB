@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo cp /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so /usr/lib

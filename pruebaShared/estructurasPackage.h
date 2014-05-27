@@ -53,6 +53,8 @@
 #define D_STRUCT_PCB 6
 #define D_STRUCT_SOLICITAR_BYTES 7
 #define D_STRUCT_ENVIAR_BYTES 8
+#define D_STRUCT_CREAR_SEGMENTO 9
+#define D_STRUCT_BORRAR_SEGMENTOS 10
 
 //Estructura auxiliar de stream
 typedef struct {
@@ -136,5 +138,16 @@ typedef struct struct_env_bytes{
 	uint16_t tamanio;
 	void* buffer;
 }__attribute__((__packed__)) t_struct_env_bytes;
+
+typedef struct struct_crear_segmento{
+	uint32_t ID;
+	uint32_t tamanio;
+}__attribute__((__packed__)) t_struct_crear_segmento;
+
+typedef struct struct_borrar_segmentos{
+	uint32_t ID;
+}__attribute__((__packed__)) t_struct_borrar_segmentos;
+
+
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

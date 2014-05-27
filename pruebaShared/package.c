@@ -46,6 +46,18 @@ t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
 			case D_STRUCT_PCB:
 				paquete = paquetizarStruct_pcb((t_struct_pcb *) estructuraOrigen);
 				break;
+			case D_STRUCT_ENVIAR_BYTES:
+				paquete = paquetizarStruct_env_bytes((t_struct_env_bytes *) estructuraOrigen);
+				break;
+			case D_STRUCT_SOLICITAR_BYTES:
+				paquete = paquetizarStruct_sol_bytes((t_struct_sol_bytes *) estructuraOrigen);
+				break;
+			case D_STRUCT_CREAR_SEGMENTO:
+				paquete = paquetizarStruct_crear_segmento((t_struct_crear_segmento *) estructuraOrigen);
+				break;
+			case D_STRUCT_BORRAR_SEGMENTOS:
+				paquete = paquetizarStruct_borrar_segmentos((t_struct_borrar_segmentos *) estructuraOrigen);
+				break;
 
 		}
 
@@ -278,6 +290,38 @@ t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen){
 
 }
 
+t_stream * paquetizarStruct_crear_segmento(t_struct_crear_segmento * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_crear_segmento);
+
+		char * dataNueva; //creo el data
+		dataNueva = crearDataConHeader(D_STRUCT_CREAR_SEGMENTO, paquete->length);
+
+		memcpy(dataNueva + sizeof(t_header), estructuraOrigen, sizeof(t_struct_crear_segmento));		//copio a data el numero.
+
+		paquete->data = dataNueva;
+
+		return paquete;
+}
+
+t_stream * paquetizarStruct_borrar_segmentos(t_struct_borrar_segmentos * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_borrar_segmentos);
+
+	char * dataNueva; //creo el data
+	dataNueva = crearDataConHeader(D_STRUCT_BORRAR_SEGMENTOS, paquete->length);
+
+	memcpy(dataNueva + sizeof(t_header), estructuraOrigen, sizeof(t_struct_borrar_segmentos));		//copio a data el numero.
+
+	paquete->data = dataNueva;
+
+	return paquete;
+}
+
 /*
  * Nombre: crearDataConHeader/2
  * Argumentos:
@@ -366,6 +410,20 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
 			case D_STRUCT_PCB:
 				estructuraDestino = despaquetizarStruct_pcb(dataPaquete, length);
 				break;
+			case D_STRUCT_ENVIAR_BYTES:
+				estructuraDestino = despaquetizarStruct_env_bytes(dataPaquete, length);
+				break;
+			case D_STRUCT_SOLICITAR_BYTES:
+				estructuraDestino = despaquetizarStruct_sol_bytes(dataPaquete, length);
+				break;
+			case D_STRUCT_CREAR_SEGMENTO:
+				estructuraDestino = despaquetizarStruct_crear_segmento(dataPaquete, length);
+				break;
+			case D_STRUCT_BORRAR_SEGMENTOS:
+				estructuraDestino = despaquetizarStruct_borrar_segmentos(dataPaquete, length);
+				break;
+
+
 		}
 
 	return estructuraDestino;
@@ -432,6 +490,22 @@ t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t l
 	t_struct_sol_bytes * estructuraDestino = malloc(sizeof(t_struct_sol_bytes));
 
 			memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_sol_bytes)); //copio el data del paquete a la estructura.
+
+			return estructuraDestino;
+}
+
+t_struct_borrar_segmentos * despaquetizarStruct_crear_segmento(char * dataPaquete,uint16_t length){
+	t_struct_borrar_segmentos * estructuraDestino = malloc(sizeof(t_struct_borrar_segmentos));
+
+			memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_borrar_segmentos)); //copio el data del paquete a la estructura.
+
+			return estructuraDestino;
+}
+
+t_struct_borrar_segmentos * despaquetizarStruct_borrar_segmentos(char * dataPaquete,uint16_t length){
+	t_struct_borrar_segmentos * estructuraDestino = malloc(sizeof(t_struct_borrar_segmentos));
+
+			memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_borrar_segmentos)); //copio el data del paquete a la estructura.
 
 			return estructuraDestino;
 }

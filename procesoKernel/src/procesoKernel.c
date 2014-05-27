@@ -41,6 +41,13 @@ t_list *listaBLOCK;
 #define PUERTO 5000
 #define MAX_CONNECTION_SERVER 60
 
+typedef struct registroPCB {
+    int peso;
+    t_struct_pcb pcb;
+} t_struct_peso_pcb;
+
+
+
 int main() {
 	//********************************//
 	//	  Presentacion          	  //
@@ -98,6 +105,7 @@ void* mainPLP() {
 	int socketPLP;
 	int socketPLPEscucha;
 
+
 	socketPLP= socket_crearServidor("127.0.0.1", 5000);
 	socketPLPEscucha= socket_aceptarCliente(socketPLP);
 	void * codigoAnsisop;
@@ -118,6 +126,22 @@ void* mainPLP() {
 
 
 
+	 socketPLP = socket_crearServidor("127.0.0.1",5000);
+	 socketPLPEscucha = socket_aceptarCliente(socketPLP);
+	 int socketEscucha2 = socket_aceptarCliente(socketPLP);
+
+
+	 //proceso programa
+	 int socketCliente = socket_crearCliente();
+	 socket_conectarCliente(socketCliente,"127.0.0.1",5000);
+
+	 t_struct_numero * punteroAestructura;
+	 punteroAestructura= malloc(sizeof(t_struct_numero));
+	 punteroAestructura->numero=5;
+
+	 socket_enviar(socketCliente,D_STRUCT_NUMERO,punteroAestructura);
+
+
 
 	return 0;
 }
@@ -136,6 +160,7 @@ int pcb_calcularPeso(t_medatada_program* metadata){
 }
 
 int grabarSegmentoCodigoLiteral(int32_t ID,char* codigo){
+
 //	Con el ID y el codigo literal mandar un mensaje serializado para que la UMV guarde el segmento y devuelva la direccion me memoria
 	int dir_memoria = 0;
 	return dir_memoria;

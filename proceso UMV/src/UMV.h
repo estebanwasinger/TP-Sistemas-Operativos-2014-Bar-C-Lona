@@ -36,7 +36,8 @@ void * Consultar(int posMem);
 void GrabarSegmento(char* programa, int tamanoSegmento);
 void ManejoKernel(int coneccion);
 void MostrarRangosMemoriaLibre();
-
+void EliminarSegmento(int base);
+void EliminarSegmentosDePrograma(char * programa);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();
@@ -45,16 +46,21 @@ int GuardarNuevoSegmentoOrdenado();
 int Hay_algun_rango_de_tamano_suficiente(RangoMemoria *rango);
 int CantidadMemoriaLibre();
 int GuardarNuevoSegmentoOrdenado(char* programa, int baseVirtual, int tamano);
-
+int PosicionDeSegmento(int base);
 
 //Otra firmas de funciones
 Segmento *create_segmento(char* programa,void* base, int baseVirtual,int tamano);
 t_list *RangosLibresDeMemoria();
 RangoMemoria  RangoMasGrandeLibre();
 bool SePuedeGrabarSegmento(int tamano);
+Segmento BuscarSegmento(int base);
 
 
 //Variables Estaticas
 int ALGOTIRMO_FIRSTFIT = 1;
 int ALGOTIRMO_WORSTFIT = 2;
+
+
+
+
 

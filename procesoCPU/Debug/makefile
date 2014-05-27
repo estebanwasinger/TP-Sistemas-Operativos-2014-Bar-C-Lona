@@ -26,7 +26,7 @@ endif
 all: procesoCPU
 
 dependents:
-	-cd /home/utnso/tp-2014-1c-bar-c-lona/pruebaShared/Debug && $(MAKE) all
+	-cd /home/utnso/tp-2014-1c-bar-c-lona/pruebaShared/Debug && $(MAKE) clean all
 
 # Tool invocations
 procesoCPU: $(OBJS) $(USER_OBJS) /home/utnso/tp-2014-1c-bar-c-lona/pruebaShared/Debug/libpruebaShared.so

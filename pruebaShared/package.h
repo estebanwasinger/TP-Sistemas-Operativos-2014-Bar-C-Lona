@@ -30,7 +30,8 @@ t_stream * paquetizarStruct_string(t_struct_string * estructuraOrigen); //D
 t_stream * paquetizarStruct_handshake_umv(t_struct_handshake_umv * estructuraOrigen);
 t_stream * paquetizarStruct_signal(t_struct_signal * estructuraOrigen); //E
 t_stream * paquetizarStruct_pcb(t_struct_pcb * estructuraOrigen);
-
+t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen);
+t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen);
 // ---------------------------------------------------------------------------
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
@@ -49,7 +50,8 @@ t_struct_string * despaquetizarStruct_string(char * dataPaquete, uint16_t length
 t_struct_handshake_umv * despaquetizarStruct_handshake_umv(char * dataPaquete, uint16_t length);
 t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length);
 t_struct_pcb * despaquetizarStruct_pcb(char * dataPaquete, uint16_t length);
-
+t_struct_env_bytes * despaquetizarStruct_env_bytes(char * dataPaquete,uint16_t length);
+t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t length);
 // ---------------------------------------------------------------------------
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA DESPAQUETIZAR

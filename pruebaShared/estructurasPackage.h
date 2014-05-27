@@ -51,7 +51,8 @@
 #define D_STRUCT_HANDSHAKE_UMV 4
 #define D_STRUCT_SIGNAL 5
 #define D_STRUCT_PCB 6
-
+#define D_STRUCT_SOLICITAR_BYTES 7
+#define D_STRUCT_ENVIAR_BYTES 8
 
 //Estructura auxiliar de stream
 typedef struct {
@@ -122,6 +123,18 @@ typedef struct struct_pcb {
 
 } __attribute__ ((__packed__)) t_struct_pcb;
 
+typedef struct struct_sol_bytes{
+	uint32_t base;
+	uint16_t offset;
+	uint16_t tamanio;
 
+}__attribute__((__packed__)) t_struct_sol_bytes;
+
+typedef struct struct_env_bytes{
+	uint32_t base;
+	uint16_t offset;
+	uint16_t tamanio;
+	void* buffer;
+}__attribute__((__packed__)) t_struct_env_bytes;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

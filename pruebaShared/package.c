@@ -244,6 +244,39 @@ t_stream * paquetizarStruct_pcb(t_struct_pcb * estructuraOrigen){
 	return paquete;
 }
 
+t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+	paquete->length = sizeof(t_header) + sizeof(t_struct_env_bytes);
+
+		char * dataNueva; //creo el data
+		dataNueva = crearDataConHeader(D_STRUCT_ENVIAR_BYTES, paquete->length);
+
+		memcpy(dataNueva + sizeof(t_header), estructuraOrigen, sizeof(t_struct_env_bytes));		//copio a data el numero.
+
+		paquete->data = dataNueva;
+
+		return paquete;
+}
+
+
+t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen){
+
+	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+
+		paquete->length = sizeof(t_header) + sizeof(t_struct_sol_bytes);
+
+		char * dataNueva; //creo el data
+		dataNueva = crearDataConHeader(D_STRUCT_SOLICITAR_BYTES, paquete->length);
+
+		memcpy(dataNueva + sizeof(t_header), estructuraOrigen, sizeof(t_struct_sol_bytes));		//copio a data el numero.
+
+		paquete->data = dataNueva;
+
+		return paquete;
+
+}
 
 /*
  * Nombre: crearDataConHeader/2
@@ -385,6 +418,22 @@ t_struct_pcb * despaquetizarStruct_pcb(char * dataPaquete, uint16_t length){
 	memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_pcb)); //copio el data del paquete a la estructura.
 
 	return estructuraDestino;
+}
+
+t_struct_env_bytes * despaquetizarStruct_env_bytes(char * dataPaquete,uint16_t length){
+	t_struct_env_bytes * estructuraDestino = malloc(sizeof(t_struct_env_bytes));
+
+		memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_env_bytes)); //copio el data del paquete a la estructura.
+
+		return estructuraDestino;
+}
+
+t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t length){
+	t_struct_sol_bytes * estructuraDestino = malloc(sizeof(t_struct_sol_bytes));
+
+			memcpy(estructuraDestino, dataPaquete, sizeof(t_struct_sol_bytes)); //copio el data del paquete a la estructura.
+
+			return estructuraDestino;
 }
 
 /*

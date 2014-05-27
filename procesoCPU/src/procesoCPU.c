@@ -17,7 +17,11 @@
 #include <commons/collections/dictionary.h>
 #include <parser/metadata_program.h>
 #include <parser/parser.h>
+#include <package.h>
+#include <estructurasPackage.h>
+#include <socket.h>
 #include <stdint.h>
+
 
 
 int Puerto_Kernel;
@@ -25,8 +29,8 @@ int Puerto_UMV;
 char * IP_Kernel;
 char * IP_UMV;
 t_log * logger;
-//t_PCB * unPcb;
 t_dictionary * dicc_variables;
+uint32_t var_seg_stack;
 
 int conf_es_valida(t_config * configuracion);
 //t_puntero definirVariable(t_nombre_variable * identificador_variable);
@@ -37,7 +41,8 @@ t_config * configuracion;
 char * temp_IP_Kernel;
 char * temp_IP_UMV;
 char * log_name;
-int nuevo_socket;
+//t_struct_pcb * otroPCB;
+
 
    log_name = malloc(strlen("CPU")+1);
    strcpy(log_name, "CPU");
@@ -78,22 +83,27 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 
 while(1){
 
-//unPcb = recibir_PCB();
-//unPcb->cursor_stack=unPcb->cursor_stack+1;
+	int socket_emisor;
+	uint32_t temp_ind_codigo;
+	uint32_t temp_counter;
 
+//	unPcb.iD=1987;
+//	unPcb.indice_codigo=0x1;
+//	unPcb.indice_etiquetas=0x34;
+//	unPcb.programa_counter=1;
+//	unPcb.seg_codigo=0x2;
+//	unPcb.seg_stack=0x3;
 
-//	unPcb=malloc(sizeof(unPcb));
-//
-//	unPcb->Id=435;
-//    unPcb->cursor_stack =0X45;
-//    unPcb->indice_codigo=0X67;
-//    unPcb->seg_stack="a";
-//	unPcb->indice_etiquetas=0X23;
-//	unPcb->program_counter=1;
-//	unPcb->seg_codigo=0X234;
-//	unPcb->size_contexto_actual=34;
-//	unPcb->size_indice_etiquetas=0X56;
+	void * estructuraRecibida;
+	t_struct_pcb tipoRecibido;
 
+	// aca recibimos el pcb del PCP
+	socket_recibir(socket_emisor,&tipoRecibido,&estructuraRecibida);
+	temp_ind_codigo =((t_struct_pcb*) estructuraRecibida)->indice_codigo;
+	temp_counter=((t_struct_pcb*)estructuraRecibida)->programa_counter;
+	temp_counter++; //incrementamos el counter;
+
+	var_seg_stack=((t_struct_pcb*) estructuraRecibida)->seg_stack; //asignamos el valor recibido del PCB a una var aux.
 
  dicc_variables =dictionary_create(); // este el diccinario de las variables del programa.
 
@@ -118,16 +128,30 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 
 
 
-//t_puntero definirVariable(t_nombre_variable  identificador_variable){
-//	memcpy(unPcb->seg_stack ,identificador_variable ,sizeof(t_nombre_variable)+sizeof(t_valor_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
-//	//asegurarme que identificador_variable sea dianmico.
-//    dictionary_put(dicc_variables,identificador_variable,unPcb->seg_stack);
-//    return unPcb+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
+t_puntero definirVariable(t_nombre_variable  identificador_variable){
+
+
+	memcpy(&var_seg_stack ,&identificador_variable ,sizeof(t_nombre_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
+	//asegurarme que identificador_variable sea dianmico.
+
+
+	dictionary_put(dicc_variables,&identificador_variable,&var_seg_stack+sizeof(t_nombre_variable));
+    return var_seg_stack+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
+
+}
 //
-//}
-//
-//
-//t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
-//
-//
-//}
+
+t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
+
+	return dictionary_get(dicc_variables,&identificador_variable);
+
+}
+
+t_valor_variable dereferenciar(t_puntero direccion_variable){ // retorna el valor de una variable
+
+    //leo la direccion del valor de la variable en el dicccionario
+	//le envia esa direccion a la umv para que me devuelva lo que hay 4 bytes despues de esa direccion.
+	//recibo el valor y lo devuelvo
+
+
+}

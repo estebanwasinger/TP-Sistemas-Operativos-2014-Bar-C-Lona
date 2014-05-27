@@ -166,3 +166,35 @@ int grabarSegmentoCodigoLiteral(int32_t ID,char* codigo){
 	return dir_memoria;
 }
 
+void insertarPCBOrdenado(t_list *lista, t_struct_peso_pcb *registroPCB){
+    int pos = 0;
+    if(list_is_empty(lista) == 0) {
+        list_add(lista, registroPCB);
+    }
+    else {
+        while (registroPCB->peso > ((t_struct_peso_pcb*)list_get(lista,pos))->peso){
+            pos++;
+
+        }
+
+    list_add_in_index(lista, (pos+1),registroPCB);
+    }
+}
+
+
+void pasarPCB(t_list *lista1, t_list *lista2) {
+
+	t_struct_pcb *nuevoPCB = (t_struct_peso_pcb*)list_remove(lista1,0);
+
+	list_add(lista2, nuevoPCB);
+
+}
+
+
+
+void pasarPCBsimple (t_list *listaNew, t_list *listaReady) {
+
+	t_struct_pcb *nuevoPCB = ((t_struct_peso_pcb*)list_remove(listaNew,0))->pcb;
+	list_add(listaReady, nuevoPCB);
+
+}

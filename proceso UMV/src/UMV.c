@@ -4,7 +4,7 @@
 void *MemFisica;
 int MemTotal;
 t_list * Segmentos_UMV;
-int AlgoritmoActual = 1;
+int AlgoritmoActual = 2;
 int FinPrograma = 0;
 
 /////////////   COMIENZO MAIN  ///////////////////
@@ -75,8 +75,6 @@ int main(void) {
     aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 3));
 	printf("4 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
 
-	MostrarRangosMemoriaLibre();
-
 	printf("\n\n");
 	GrabarSegmento("prog1", 800);
 	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
@@ -92,7 +90,6 @@ int main(void) {
     aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 4));
 	printf("5 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
 
-	MostrarRangosMemoriaLibre();
 
 	printf("\n\n");
 	printf("Cantidad Segmentos Hasta el momento %d \n\n", (int)list_size(Segmentos_UMV));
@@ -101,7 +98,7 @@ int main(void) {
 	printf("\n\n");
 
 
-
+	MostrarRangosMemoriaLibre();
 
 	return EXIT_SUCCESS;
 }
@@ -206,39 +203,42 @@ int EjecutarComandos(t_list *lista_comandos) {
 	return 0;
 }
 
-// Elije una base aleatoria y graba el segmento segun el algoritmo indicado
+// Elije una base aleatoria y graba el segmento segun el algoritmo indicado -- Ok
 void GrabarSegmento(char* programa, int tamano_Segmento) {
+	RangoMemoria rango;
 
 	if (!SePuedeGrabarSegmento(tamano_Segmento)) {
 		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento");
 		return;
 	}
 
-	// segun el algoritmo se elige una base aleatoria.
-	if (ALGOTIRMO_FIRSTFIT == AlgoritmoActual) {
+	// segun el algoritmo se elige un rago de memoria para grabar
+	if (ALGOTIRMO_FIRSTFIT == AlgoritmoActual)
+	{
 		int pos = 0;
 		int tamanoRangoLibre = 0;
-		RangoMemoria rango;
-
 		// calculamos el primer rango de memoria en el que entra el segmento
-		while (tamanoRangoLibre < tamano_Segmento) {
+		while (tamanoRangoLibre < tamano_Segmento)
+		{
 			rango = *((RangoMemoria*)list_get(RangosLibresDeMemoria(), pos));
 			tamanoRangoLibre = rango.tamano;
 			pos++;
 		}
-		// calculamos la base aletoria dentro del rango
-		int base = (rand() % (rango.base + rango.tamano - tamano_Segmento)) + (rango.base);
-		GuardarNuevoSegmentoOrdenado(programa, base, tamano_Segmento);
-
-	} else {
-		RangoMemoria elRangoGrande = RangoMasGrandeLibre();
-		// calculamos la base, es un numero random en el que puede entrar el segmento dentro del mayor rango de memoria libre
-		int base = (rand() % (elRangoGrande.base + elRangoGrande.tamano)) + (elRangoGrande.base + elRangoGrande.tamano - tamano_Segmento);
-		GuardarNuevoSegmentoOrdenado(programa, base, tamano_Segmento);
 	}
+	else // algortimo worst fit
+	{
+		rango = RangoMasGrandeLibre();
+	}
+
+	// calculamos la base aletoria dentro del rango
+	int menor_base = rango.base;
+	int mayor_base= rango.tamano - tamano_Segmento;
+	int base = rand() % mayor_base + menor_base;
+	// guardamos ordenado
+	GuardarNuevoSegmentoOrdenado(programa, base, tamano_Segmento);
 }
 
-// guarda el un nuevo segmento ordenado por su base en lista de segmentos -- OK
+// Guarda el un nuevo segmento ordenado por su base en lista de segmentos -- OK
 int GuardarNuevoSegmentoOrdenado(char* programa, int base_virtual, int tamano) {
 	Segmento * nuevo_segmento = create_segmento(programa,
 			(MemFisica + base_virtual), base_virtual, tamano);
@@ -308,6 +308,7 @@ int CantidadMemoriaLibre() {
 	return tamanoTotal;
 }
 
+//Nos muestra los rangos libres de mem
 void MostrarRangosMemoriaLibre() {
 
 	void ContarTamano(RangoMemoria* rango) {
@@ -319,7 +320,6 @@ void MostrarRangosMemoriaLibre() {
 	list_iterate(rangosLibres, (void*)ContarTamano);
 
 }
-
 
 // Nos devuelve un array de RangosDeMemoria con todos los rangos de memoria libres;
 t_list *RangosLibresDeMemoria() {
@@ -436,7 +436,7 @@ int EnviarBytes(int base, int offset, int tamano){
 // Nos devuelve la pos del rango de mayor tamaño -- OK
 RangoMemoria RangoMasGrandeLibre() {
 	int pos = 0;
-	int mayorTamano;
+	int mayorTamano = 0;
 	RangoMemoria mayorRango;
 	t_list * rangos = RangosLibresDeMemoria();
 
@@ -446,6 +446,7 @@ RangoMemoria RangoMasGrandeLibre() {
 			mayorRango = rango;
 			mayorTamano = rango.tamano;
 		}
+		pos++;
 	}
 
 	return mayorRango;

@@ -260,22 +260,26 @@ t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen){
 
 	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
-	paquete->length = sizeof(t_header) + sizeof(t_struct_env_bytes);
+	paquete->length = sizeof(t_header) + (estructuraOrigen->tamanio) + sizeof(t_struct_env_bytes);
 
-		char * dataNueva; //creo el data
-		dataNueva = crearDataConHeader(D_STRUCT_ENVIAR_BYTES, paquete->length);
+	char * data = crearDataConHeader(D_STRUCT_NOMBREMENSAJE, paquete->length); //creo el data
 
-		memcpy(dataNueva + sizeof(t_header), estructuraOrigen, sizeof(t_struct_env_bytes));		//copio a data el numero.
+	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
 
-		paquete->data = dataNueva;
+	memcpy(data + tamanoTotal, estructuraOrigen->buffer, estructuraOrigen->tamanio);		//copio a data el nombre.
 
-		return paquete;
+	tamanoTotal += estructuraOrigen->tamanio;
+
+	paquete->data = data;
+
+	return paquete;
+
 }
 
 
 t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen){
 
-	t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
+	  t_stream * paquete = malloc(sizeof(t_stream));		//creo el paquete
 
 		paquete->length = sizeof(t_header) + sizeof(t_struct_sol_bytes);
 

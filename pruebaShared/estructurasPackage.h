@@ -122,6 +122,7 @@ typedef struct struct_pcb {
 	uint32_t indice_codigo;
 	uint32_t indice_etiquetas;
 	uint32_t programa_counter;
+	uint32_t tamanio_contexto;
 
 } __attribute__ ((__packed__)) t_struct_pcb;
 

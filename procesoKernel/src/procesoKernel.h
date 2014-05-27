@@ -12,7 +12,7 @@ char* leer_codAnsisop(FILE *file);
 void imprimirMetadata();
 void* mainPLP();
 void* mainPCP();
-
+int obtenerID();
 typedef struct PCB {
     int ID;
     int SEG_CODIGO;

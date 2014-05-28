@@ -28,7 +28,74 @@ int main(void) {
 	// comienza a escuchar
 	// EscucharYLanzarHilos();
 
-	GrabarSegmento("asda", 1231231);
+	printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+
+		GrabarSegmento(1, 1000);
+
+		printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+		Segmento aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+		printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+
+		MostrarRangosMemoriaLibre();
+
+
+		printf("\n\n");
+		GrabarSegmento(21, 1800);
+		printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+		 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+		printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+		printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+		MostrarRangosMemoriaLibre();
+
+		printf("\n\n");
+		GrabarSegmento(2, 1300);
+		printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+		 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+		printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+		printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+		printf("3 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+		MostrarRangosMemoriaLibre();
+
+		printf("\n\n");
+		GrabarSegmento(2, 1200);
+		printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+
+		 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+		printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+		printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+		printf("3 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 3));
+		printf("4 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+		MostrarRangosMemoriaLibre();
+
+		printf("\n\n");
+		GrabarSegmento(12, 800);
+		printf("Cantidad Mem Libre %d \n\n", CantidadMemoriaLibre());
+
+		 aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 0));
+		printf("1 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 1));
+		printf("2 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 2));
+		printf("3 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 3));
+		printf("4 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+	    aSeg1 =  *((Segmento *)list_get(Segmentos_UMV, 4));
+		printf("5 Base: %d, Tam: %d \n", aSeg1.baseVirtual,aSeg1.tamano);
+
+		MostrarRangosMemoriaLibre();
+
+		printf("\n\n");
+		printf("Cantidad Segmentos Hasta el momento %d \n\n", (int)list_size(Segmentos_UMV));
 
 	return EXIT_SUCCESS;
 }
@@ -96,9 +163,8 @@ void Consola() {
 }
 
 // crea un segmento nuevo -- OK
-Segmento *create_segmento(char* programa, void* base, int base_virtual,
-		int tamano) {
-	Segmento *segmento_nuevo = malloc(sizeof(Segmento));
+Segmento *create_segmento(int programa, void* base, int base_virtual,int tamano) {
+	Segmento * segmento_nuevo = malloc(sizeof(Segmento));
 	segmento_nuevo->base = base;
 	segmento_nuevo->baseVirtual = base_virtual;
 	segmento_nuevo->programa = programa;
@@ -133,7 +199,7 @@ int EjecutarComandos(t_list *lista_comandos) {
 }
 
 // Elije una base aleatoria y graba el segmento segun el algoritmo indicado -- Ok
-void GrabarSegmento(char* programa, int tamano_Segmento) {
+void GrabarSegmento(int programa, int tamano_Segmento) {
 	RangoMemoria rango;
 
 	if (!SePuedeGrabarSegmento(tamano_Segmento)) {
@@ -168,7 +234,7 @@ void GrabarSegmento(char* programa, int tamano_Segmento) {
 }
 
 // Guarda el un nuevo segmento ordenado por su base en lista de segmentos -- OK
-int GuardarNuevoSegmentoOrdenado(char* programa, int base_virtual, int tamano) {
+int GuardarNuevoSegmentoOrdenado(int programa, int base_virtual, int tamano) {
 	Segmento * nuevo_segmento = create_segmento(programa,
 			(MemFisica + base_virtual), base_virtual, tamano);
 
@@ -459,13 +525,13 @@ void EliminarSegmento(int base){
 }
 
 // elimina todos los segmentos de un programa -- OK
-void EliminarSegmentosDePrograma(char * programa){
+void EliminarSegmentosDePrograma(int programa){
 	Segmento segmento;
 	int pos = 0;
 	while( pos < list_size(Segmentos_UMV))
 	{
 		segmento = *((Segmento*)list_get(Segmentos_UMV,pos));
-		if(string_equals_ignore_case(segmento.programa,programa)){
+		if(segmento.programa == programa){
 			EliminarSegmento(segmento.baseVirtual);
 		}
 		else{

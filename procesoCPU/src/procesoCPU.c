@@ -28,6 +28,8 @@ int Puerto_Kernel;
 int Puerto_UMV;
 char * IP_Kernel;
 char * IP_UMV;
+int socket_kernel;
+int socket_UMV;
 t_log * logger;
 t_dictionary * dicc_variables;
 uint32_t var_seg_stack;
@@ -79,11 +81,11 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 	//----------------termino archivo de configuracion--------------------//
 
 
-	int socket_kernel=socket_crearYConectarCliente(IP_Kernel,Puerto_Kernel); // se conecta al kernel
+	socket_kernel=socket_crearYConectarCliente(IP_Kernel,Puerto_Kernel); // se conecta al kernel
 
 while(1){
 
-	int socket_UMV;
+//	int socket_UMV;			//declaro los sockets globales para usarlos en las funciones
 //	int socket_kernel;
 	uint32_t temp_ind_codigo;
 	uint32_t temp_counter;

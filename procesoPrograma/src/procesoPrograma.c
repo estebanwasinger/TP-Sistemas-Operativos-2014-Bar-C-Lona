@@ -27,9 +27,9 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <sys/ioctl.h>
-#include "socket.h"
-#include "estructurasPackage.h"
-#include "package.h"
+#include <socket.h>
+#include <estructurasPackage.h>
+#include <package.h>
 
 
 #define DIRECCION "127.0.0.1"
@@ -93,19 +93,16 @@ int main(int argc, char** argv) {
 	//**********************************//
 	//	   Leectura y envio de codigo	//
 	//**********************************//
-	t_struct_handshakeUMV soyKernel;
-
-
 
 	file = abrir_archivoRO(argv);
-//	int size = size_archivo(file);
-	//char* codigo = leer_codAnsisop(file);
-	//socket_enviar(socketKernel,D_STRUCT_HANDSHAKEUMV,);
-	socket_enviar(socketKernel,3,&soyKernel);
+	int size = size_archivo(file);
+	char* codigo = leer_codAnsisop(file);
 
-//	send(socketKernel, codigo, size, 0);
-//	send(socketKernel,"fin",3,0);
+	socket_enviar(socketKernel,D_STRUCT_STRING,codigo);
 
+	while(1){
+
+	}
 	close(socketKernel);
 	return EXIT_SUCCESS;
 }
@@ -133,8 +130,6 @@ char* leer_codAnsisop(FILE *file) {
 	char* text = malloc(size2);
 	char text2[size2];
 	int i = 0;
-//	while ((c = getc(file)) != '\n')
-//		(c = getc(file));
 	while ((c = getc(file)) != EOF) { //Lee cada caracter hasta encuentre el EndOfFile
 		text2[i] = c;
 		i++;
@@ -145,155 +140,8 @@ char* leer_codAnsisop(FILE *file) {
 	return text;
 }
 
-/*
- * Nombre: abrir_archivoRO/1
- *
- *
- */
 FILE *abrir_archivoRO(char** argv) {
 	//printf("%s \n", argv[2]);
 	return (fopen("completo.ansisop", "r"));
-}
-
-int socket_crearCliente(void) {
-
-	int sockfd;
-
-	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		perror("Error al crear socket"); //Crear log para este error.
-		return -1;
-	}
-
-	return sockfd;
-
-}
-
-int socket_conectarCliente(int sockfd, char *serverIp, int serverPort) {
-
-	struct sockaddr_in socketInfo;
-
-	//INICIALIZACION DE SOCKETINFO
-	socketInfo.sin_family = AF_INET;
-	socketInfo.sin_port = htons(serverPort); //host to network short
-	socketInfo.sin_addr.s_addr = inet_addr(serverIp);
-	memset(&(socketInfo.sin_zero), '\0', 8); // PONGO A 0 EL RESTO DE LA ESTRUCTURA
-	// ME CONECTO CON LA DIRECCIÓN DE SOCKETINFO
-	//SIEMPRE VERIFICANDO QUE NO DEN -1 LAS FUNCIONES O 0 EN CASO DE RECV() -- SOLO PARA SERVER IGUAL :)
-
-	if (connect(sockfd, (struct sockaddr *) &socketInfo, sizeof(socketInfo))
-			== -1) {
-		perror("Falló la conexión"); // Cambiar esto por un log.
-		return -1;
-	}
-
-	return sockfd;
-}
-int socket_crearYConectarCliente(char *serverIp, int serverPort) {
-	int sockfd;
-	sockfd = socket_crearCliente();
-	if (sockfd < 0)
-		return -1;
-
-	sockfd = socket_conectarCliente(sockfd, (char*) serverIp, serverPort);
-
-	return sockfd;
-}
-int socket_crearServidor(char *ip, int port) {
-	int socketEscucha;
-	struct sockaddr_in miSocket; //ESTE ES EL SOCKET CON LA DRECCION IP
-
-	if ((socketEscucha = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		perror("Error al crear socket");
-		return -1;
-	}
-
-	miSocket.sin_family = AF_INET;
-	miSocket.sin_port = htons(port);
-	miSocket.sin_addr.s_addr = inet_addr(ip);
-	memset(&(miSocket.sin_zero), '\0', 8); //NI LE PRESTEN ATENCION A ESTO
-
-	int yes = 1;
-	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
-			== -1) {
-		perror("setsockopt");
-		exit(1);
-	}
-
-	if (bind(socketEscucha, (struct sockaddr*) &miSocket, sizeof(miSocket))
-			== -1) {
-		perror("Error al bindear el socket escucha");
-		return -1;
-	}
-
-	if (listen(socketEscucha, MAX_CONNECTION_SERVER) == -1) {
-		perror("Error en la puesta de escucha");
-		return -1;
-	}
-
-	return socketEscucha;
-
-}
-int socket_crearServidorPuertoRandom(char *ip, int * port) {
-	int socketEscucha;
-	struct sockaddr_in miSocket; //ESTE ES EL SOCKET CON LA DRECCION IP
-
-	if ((socketEscucha = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		perror("Error al crear socket");
-		return -1;
-	}
-
-	miSocket.sin_family = AF_INET;
-	miSocket.sin_port = htons(0);
-	miSocket.sin_addr.s_addr = inet_addr(ip);
-	memset(&(miSocket.sin_zero), '\0', 8); //NI LE PRESTEN ATENCION A ESTO
-
-	int yes = 1;
-	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))
-			== -1) {
-		perror("setsockopt");
-		exit(1);
-	}
-
-	if (bind(socketEscucha, (struct sockaddr*) &miSocket, sizeof(miSocket))
-			== -1) {
-		perror("Error al bindear el socket escucha");
-		return -1;
-	}
-
-	if (listen(socketEscucha, MAX_CONNECTION_SERVER) == -1) {
-		perror("Error en la puesta de escucha");
-		return -1;
-	}
-
-	struct sockaddr_in sin;
-	socklen_t len = sizeof(sin);
-	if (getsockname(socketEscucha, (struct sockaddr *) &sin, &len) == -1) {
-		perror("getsockname");
-		return -1;
-	}
-
-	*port = ntohs(sin.sin_port);
-
-	return socketEscucha;
-}
-int socket_aceptarCliente(int socketEscucha) {
-	int socketNuevaConexion;
-	unsigned int size_sockAddrIn;
-
-	struct sockaddr_in suSocket;
-
-	size_sockAddrIn = sizeof(struct sockaddr_in);
-	socketNuevaConexion = accept(socketEscucha, (struct sockaddr *) &suSocket,
-			&size_sockAddrIn);
-
-	if (socketNuevaConexion < 0) {
-
-		perror("Error al aceptar conexion entrante");
-		return -1;
-
-	}
-
-	return socketNuevaConexion;
-
 }
 

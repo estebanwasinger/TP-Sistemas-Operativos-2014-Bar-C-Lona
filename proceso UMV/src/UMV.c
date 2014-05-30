@@ -28,6 +28,7 @@ int main(void) {
 	// comienza a escuchar
 	// EscucharYLanzarHilos();
 
+	Consola();
 
 	return EXIT_SUCCESS;
 }
@@ -81,8 +82,7 @@ void Consola() {
 				list_add(listaComandos, comando);
 				comando = string_new();
 			} else {
-				comando[strlen(comando)] = c;
-				comando[strlen(comando) + 1] = '\0';
+				string_append(comando,(char*)c);
 			}
 			c = getchar();
 		}
@@ -125,8 +125,30 @@ int EjecutarComandos(t_list *lista_comandos) {
 		CompactaMemoria();
 		return 1;
 	}
+	if (string_equals_ignore_case(nombreFuncion, "crearSegmento")
+			&& cantidadParams == 0) {
+		GrabarSegmento(((int)list_get(lista_comandos, 1)),((int)list_get(lista_comandos, 2)));
+		return 1;
+	}
+	if (string_equals_ignore_case(nombreFuncion, "RangosMemoriaLibres")
+			&& cantidadParams == 0) {
+		MostrarRangosMemoriaLibre();
+		return 1;
+	}
+	if (string_equals_ignore_case(nombreFuncion, "MostrarSegmento")
+			&& cantidadParams == 1) {
+		Segmento segmento = *((Segmento *)list_get(Segmentos_UMV,(int)list_get(lista_comandos, 1)));
+		printf("Segmento %d, Base: %d, Tamano: %d",(int)list_get(lista_comandos, 1), segmento.baseVirtual, segmento.tamano);
+		return 1;
+	}
+	if (string_equals_ignore_case(nombreFuncion, "CambiarAlgoritmo")
+			&& cantidadParams == 1) {
+		CambiarAlgoritmo((char*)list_get(lista_comandos, 1));
+		return 1;
+	}
 
-	printf("No se encuentra el comando o alguno de los parametros es invalido");
+
+	printf("No se encuentra el comando o alguno de los parametros es invalido\n");
 	return 0;
 }
 
@@ -348,15 +370,32 @@ void CompactaMemoria() {
 
 		pos++;
 	}
+
+	printf("Compactacion Exitosa");
 }
 
 // solicita bytes para grabar en memoria
 void SolicitarBytesParaGrabar(int base, int offset, int tamano, void* buffer){
+	Segmento segmento = BuscarSegmento(base);
+	int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
+	if(max_direccion_mem_segmento < base + offset + tamano){
+		printf("Violacion de Segmento. Memoria no accesible por este segmento");
+		return;
+	}
+
 	memcpy((MemFisica + base + offset),buffer,tamano);
 }
 
 // Envia bytes
 void * EnviarBytes(int base, int offset, int tamano){
+
+	Segmento segmento = BuscarSegmento(base);
+	int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
+	if(max_direccion_mem_segmento < base + offset + tamano){
+		printf("Violacion de Segmento. Memoria no accesible por este segmento");
+		return NULL;
+	}
+
 	void * buffer;
 	buffer = malloc(tamano);
 	memcpy(buffer,(MemFisica + base + offset), tamano);
@@ -423,7 +462,14 @@ void ManejoKernel(int coneccion){
 	socket_recibir(coneccion,&tipo_estructura, &nuevoSegmento);
 }
 
-// devuelve la posicion de un segmento en la lista de segmentos por su base -- O
+// se encarga de manejar una coneccion con una CPU
+void ManejoCPU(int coneccion){
+	t_tipoEstructura tipo_estructura;
+	void * estructura;
+	socket_recibir(coneccion, &tipo_estructura, &estructura);
+}
+
+// devuelve la posicion de un segmento en la lista de segmentos por su base -- OK
 int PosicionDeSegmento(int base){
 	Segmento segmento;
 	int pos = 0;

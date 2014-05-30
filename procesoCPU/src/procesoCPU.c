@@ -83,7 +83,8 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 
 while(1){
 
-	int socket_emisor;
+	int socket_UMV;
+	int socket_recibir;
 	uint32_t temp_ind_codigo;
 	uint32_t temp_counter;
 
@@ -98,16 +99,45 @@ while(1){
 	t_struct_pcb tipoRecibido;
 
 	// aca recibimos el pcb del PCP
-	socket_recibir(socket_emisor,&tipoRecibido,&estructuraRecibida);
+	socket_recibir(socket_recibir,&tipoRecibido,&estructuraRecibida);
 	temp_ind_codigo =((t_struct_pcb*) estructuraRecibida)->indice_codigo;
 	temp_counter=((t_struct_pcb*)estructuraRecibida)->programa_counter;
 	temp_counter++; //incrementamos el counter;
 
 	var_seg_stack=((t_struct_pcb*) estructuraRecibida)->seg_stack; //asignamos el valor recibido del PCB a una var aux.
+	t_struct_sol_bytes * solicitar_indice = malloc(sizeof(t_struct_sol_bytes));
+	solicitar_indice->base=temp_ind_codigo;
+	solicitar_indice->offset=temp_ind_codigo;
+	solicitar_indice->tamanio=2*sizeof(uint32_t);
+
+socket_UMV=socket_crearYConectarCliente(IP_UMV,Puerto_UMV); //nos conectamos a la UMV
+socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice); // le envio a la umv el base_indice y offset para que
+																	 //me devuelva los 8 bytes que hay despues de esa base
+
+//aca vamos a recibir el char* conteniendo el numero de Indice de Codigo y su desplazamiento, para asi poder enviarle
+//la base del segemento codigo con el offset y el tamnio.
+//socket_recibir(socket_recibir,tipo_recibir_bytes,t_struct_recibir_bytes);
+
 
  dicc_variables =dictionary_create(); // este el diccinario de las variables del programa.
 
 
+//estas son pruebas.
+
+//    t_stream * unStream = malloc(sizeof(t_stream));
+//    t_struct_env_bytes * env1=malloc(sizeof(t_struct_env_bytes));
+//
+//    env1->base=23;
+//    env1->offset=12;
+//    env1->tamanio=12;
+//    env1->buffer=strdup("holacomoteva");
+//
+//   unStream = paquetizarStruct_env_bytes(env1);
+
+//   printf("hola\n");
+//   printf("%d\n",unStream->length);
+//   printf("%s\n",unStream->data);
+//   printf("hola\n");
 
 }
 
@@ -127,31 +157,31 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 }
 
 
-
-t_puntero definirVariable(t_nombre_variable  identificador_variable){
-
-
-	memcpy(&var_seg_stack ,&identificador_variable ,sizeof(t_nombre_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
-	//asegurarme que identificador_variable sea dianmico.
-
-
-	dictionary_put(dicc_variables,&identificador_variable,&var_seg_stack+sizeof(t_nombre_variable));
-    return var_seg_stack+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
-
-}
 //
-
-t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
-
-	return dictionary_get(dicc_variables,&identificador_variable);
-
-}
-
-t_valor_variable dereferenciar(t_puntero direccion_variable){ // retorna el valor de una variable
-
-    //leo la direccion del valor de la variable en el dicccionario
-	//le envia esa direccion a la umv para que me devuelva lo que hay 4 bytes despues de esa direccion.
-	//recibo el valor y lo devuelvo
-
-
-}
+//t_puntero definirVariable(t_nombre_variable  identificador_variable){
+//
+//
+//	memcpy(&var_seg_stack ,&identificador_variable ,sizeof(t_nombre_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
+//	//asegurarme que identificador_variable sea dianmico.
+//
+//
+//	dictionary_put(dicc_variables,&identificador_variable,&var_seg_stack+sizeof(t_nombre_variable));
+//    return var_seg_stack+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
+//
+//}
+////
+//
+//t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
+//
+//	return dictionary_get(dicc_variables,&identificador_variable);
+//
+//}
+//
+//t_valor_variable dereferenciar(t_puntero direccion_variable){ // retorna el valor de una variable
+//
+//    //leo la direccion del valor de la variable en el dicccionario
+//	//le envia esa direccion a la umv para que me devuelva lo que hay 4 bytes despues de esa direccion.
+//	//recibo el valor y lo devuelvo
+//
+//
+//}

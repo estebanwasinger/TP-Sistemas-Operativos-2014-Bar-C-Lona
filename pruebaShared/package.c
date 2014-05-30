@@ -262,9 +262,9 @@ t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen){
 
 	paquete->length = sizeof(t_header) + (estructuraOrigen->tamanio) + sizeof(t_struct_env_bytes);
 
-	void * data = crearDataConHeader(D_STRUCT_NOMBREMENSAJE, paquete->length); //creo el data
+	void * data = crearDataConHeader(D_STRUCT_ENVIAR_BYTES, paquete->length); //creo el data
 
-	int tamanoTotal = sizeof(t_header), tamanoDato = 0;
+	int tamanoTotal = sizeof(t_header);
 
 	memcpy(data + tamanoTotal, estructuraOrigen,sizeof(t_struct_env_bytes));
 

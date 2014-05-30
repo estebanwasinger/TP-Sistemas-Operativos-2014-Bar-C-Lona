@@ -79,12 +79,12 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 	//----------------termino archivo de configuracion--------------------//
 
 
-	socket_crearYConectarCliente(IP_Kernel,Puerto_Kernel); // se conecta al kernel
+	int socket_kernel=socket_crearYConectarCliente(IP_Kernel,Puerto_Kernel); // se conecta al kernel
 
 while(1){
 
 	int socket_UMV;
-	int socket_recibir;
+//	int socket_kernel;
 	uint32_t temp_ind_codigo;
 	uint32_t temp_counter;
 
@@ -99,7 +99,7 @@ while(1){
 	t_struct_pcb tipoRecibido;
 
 	// aca recibimos el pcb del PCP
-	socket_recibir(socket_recibir,&tipoRecibido,&estructuraRecibida);
+	socket_recibir(socket_kernel,&tipoRecibido,&estructuraRecibida);
 	temp_ind_codigo =((t_struct_pcb*) estructuraRecibida)->indice_codigo;
 	temp_counter=((t_struct_pcb*)estructuraRecibida)->programa_counter;
 	temp_counter++; //incrementamos el counter;
@@ -157,6 +157,7 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 }
 
 
+//PRIMITIVAS ANSISOP
 //
 //t_puntero definirVariable(t_nombre_variable  identificador_variable){
 //
@@ -185,3 +186,56 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 //
 //
 //}
+// void asignar(t_puntero direccion_variable, t_valor_variable valor){ //asigna el valor que recibimos de la funcion "dereferenciar" a la variable en cuestion
+//
+//				memcpy(direccion_variable,&valor,sizeof(t_valor_variable);
+//}
+//
+// t_valor_variable obtenerValorCompartida(t_nombre_compartida variable){//solicita al kernel valor de una variable compartida
+//
+// }
+//
+//t_valor_variable asignarValorCompartida(t_nombre_compartida variable, t_valor_variable valor){// solicita al kernel asignar un valor a la variable compartida
+//
+// }
+//
+//t_puntero_instruccion irAlLabel(t_nombre_etiqueta etiqueta){// devuelve el numero de primera instruccion ejecutable de etiqueta, -1 si error
+//
+//}
+//
+//t_puntero_instruccion llamarSinRetorno(t_nombre_etiqueta etiqueta, t_puntero_instruccion linea_en_ejecucion){ //guarda el contexto de ejecucion para poder retornar luego, muestra un nuevo contexto vacio y retorna el numero de instruccion a ejecutar
+//
+//}
+//
+//t_puntero_instruccion llamarConRetorno(t_nombre_etiqueta etiqueta, t_puntero donde_retornar, t_puntero_instruccion linea_en_ejecucion){ //guarda contexto de ejecucion actual, para retomar luego, y guarda la posicion de la variable entregada por donde_retornar
+//
+//}
+//
+//t_puntero_instruccion finalizar(void){ //cambia el contexto de ejecucion del actual al anterior, se recupera el cursor de contexto actual y program cuonter apilados en el stack. Si el contexto principal(ubicado al principio del stack) finalizo, devuelve -1
+//
+//}
+//
+//t_puntero_intruccion retornar(t_valor_variable retorno){ // cambia contexto de ejecucion actual por el anterior recuperando cursor de contexto acutal, program counter y direccion a donde retornar,
+//
+//}
+//
+//int imprimir(t_valor_variable valor_mostrar){ // envia al kernel valor_mostrar para que este le envia al programa en ejecucion y que imprima en consola
+//
+//}
+//
+//int imprimirTexto(char* texto){ // envia al kernel una cadena de texto para q este la envie al programa en ejecucion y que muestre por pantalla
+//
+//}
+//
+//int entradaSalida(t_nombre_dispositivo, int tiempo){ // informa al kernel que el programa actual pretende usar el dispositivo, durante tiempo
+//
+//}
+//
+//int wait(t_nombre_semaforo identificador_semaforo){ // informa al kernel que ejecute la funcion wait para el semaforo identificador_semaforo, el kernel decide si bloquear o no
+//
+//}
+//
+//int signal(t_nombre_semaforo idetificador_semaforo){ // informa al kernel que ejecute signal correspondiente para el semaforo identificador_semaforo
+//
+//}
+

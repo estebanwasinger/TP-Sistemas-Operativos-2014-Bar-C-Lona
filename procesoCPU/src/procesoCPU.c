@@ -28,8 +28,8 @@ int Puerto_Kernel;
 int Puerto_UMV;
 char * IP_Kernel;
 char * IP_UMV;
-int socket_kernel;
-int socket_UMV;
+int socket_kernel; // sockets globales para ser usados en las primitivas
+int socket_UMV;    // sockets globales para ser usados en las primitivas
 t_log * logger;
 t_dictionary * dicc_variables;
 uint32_t var_seg_stack;
@@ -83,37 +83,45 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 
 	socket_kernel=socket_crearYConectarCliente(IP_Kernel,Puerto_Kernel); // se conecta al kernel
 
-while(1){
-
-//	int socket_UMV;			//declaro los sockets globales para usarlos en las funciones
-//	int socket_kernel;
 	uint32_t temp_ind_codigo;
 	uint32_t temp_counter;
 
-//	unPcb.iD=1987;
-//	unPcb.indice_codigo=0x1;
-//	unPcb.indice_etiquetas=0x34;
-//	unPcb.programa_counter=1;
-//	unPcb.seg_codigo=0x2;
-//	unPcb.seg_stack=0x3;
-
 	void * estructuraRecibida;
-	t_struct_pcb tipoRecibido;
+	t_tipoEstructura tipoRecibido;
+
+//while(1){
+
+
+//	int socket_UMV;			//declaro los sockets globales para usarlos en las funciones
+//	int socket_kernel;
 
 	// aca recibimos el pcb del PCP
 	socket_recibir(socket_kernel,&tipoRecibido,&estructuraRecibida);
+
+	if(tipoRecibido != D_STRUCT_PCB){ //verificamos que el PCB sea el correcto.
+	 printf("Struct equivocado\n");
+		return 0;
+	}
+
 	temp_ind_codigo =((t_struct_pcb*) estructuraRecibida)->indice_codigo;
 	temp_counter=((t_struct_pcb*)estructuraRecibida)->programa_counter;
-	temp_counter++; //incrementamos el counter;
+	temp_counter++;
 
 	var_seg_stack=((t_struct_pcb*) estructuraRecibida)->seg_stack; //asignamos el valor recibido del PCB a una var aux.
+
 	t_struct_sol_bytes * solicitar_indice = malloc(sizeof(t_struct_sol_bytes));
+
 	solicitar_indice->base=temp_ind_codigo;
 	solicitar_indice->offset=temp_ind_codigo;
 	solicitar_indice->tamanio=2*sizeof(uint32_t);
 
-socket_UMV=socket_crearYConectarCliente(IP_UMV,Puerto_UMV); //nos conectamos a la UMV
-socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice); // le envio a la umv el base_indice y offset para que
+	printf("%d\n",solicitar_indice->tamanio);
+
+
+
+
+//socket_UMV=socket_crearYConectarCliente(IP_UMV,Puerto_UMV); //nos conectamos a la UMV
+//socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice); // le envio a la umv el base_indice y offset para que
 																	 //me devuelva los 8 bytes que hay despues de esa base
 
 //aca vamos a recibir el char* conteniendo el numero de Indice de Codigo y su desplazamiento, para asi poder enviarle
@@ -141,7 +149,7 @@ socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice); // le envio
 //   printf("%s\n",unStream->data);
 //   printf("hola\n");
 
-}
+//}
 
 	return 0;
 

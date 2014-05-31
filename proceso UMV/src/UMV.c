@@ -12,7 +12,7 @@ int FinPrograma = 0;
 int main(void) {
 	//Inicializamos las cosas
 	Segmentos_UMV = list_create();
-	srand(time(NULL ));
+	srand(time(NULL));
 
 	// Obtenemos la cantidad de memoria y la alocamos
 	MemTotal = ObtenerCantidadMemoriaTotal();
@@ -21,12 +21,6 @@ int main(void) {
 		return -1;
 	}
 	MemFisica = malloc(MemTotal);
-
-	// comienzan a correr los procesos
-	// LanzarConsola();
-
-	// comienza a escuchar
-	// EscucharYLanzarHilos();
 
 	Consola();
 
@@ -64,7 +58,7 @@ void LanzarConsola() {
 // maneja consola y controla los comandos ingresados por teclado --- OK
 void Consola() {
 	//variables locales
-	char* comando = string_new();
+	char comando[200];
 	t_list *listaComandos = list_create();
 
 	// nos preparamos para leer
@@ -72,25 +66,33 @@ void Consola() {
 	while (1) {
 		char c = getchar();
 		//si el primer caracter es un espacio hacemos B
-		if (c == ' ') {
+		if (c == ' ')
 			return;
-		}
+
 
 		while (c != '\n') {
 			//si hay un espacio agregamos el comando a la lista e intanceamos nueva string
-			if (c == ' ') {
-				list_add(listaComandos, comando);
-				comando = string_new();
-			} else {
-				string_append(comando,(char*)c);
+			if (c == ' ')
+			{
+				list_add(listaComandos, strdup(comando));
+				comando[0] = '\0';
+			}
+			else
+			{
+				int len = strlen(comando);
+				comando[len] = c;
+				comando[len + 1] = '\0';
 			}
 			c = getchar();
 		}
 
-		list_add(listaComandos, comando);
+		list_add(listaComandos, strdup(comando));
 
 		// ejecutamos el comando ingresado
 		EjecutarComandos(listaComandos);
+		list_iterate(listaComandos,free);
+		list_clean(listaComandos);
+		comando[0] = '\0';
 	}
 }
 
@@ -116,9 +118,9 @@ RangoMemoria *create_rango_mem(int base, int tamano) {
 
 // Ejecuta los comandos que entran por la consola
 int EjecutarComandos(t_list *lista_comandos) {
-	char *nombreFuncion = string_new();
+	char *nombreFuncion = malloc(sizeof(char)*100);
 	int cantidadParams = list_size(lista_comandos) - 1;
-	nombreFuncion = (char*) list_get(lista_comandos, 0);
+	nombreFuncion = (char*)list_get(lista_comandos, 0);
 
 	if (string_equals_ignore_case(nombreFuncion, "compactar")
 			&& cantidadParams == 0) {
@@ -126,8 +128,12 @@ int EjecutarComandos(t_list *lista_comandos) {
 		return 1;
 	}
 	if (string_equals_ignore_case(nombreFuncion, "crearSegmento")
-			&& cantidadParams == 0) {
-		GrabarSegmento(((int)list_get(lista_comandos, 1)),((int)list_get(lista_comandos, 2)));
+			&& cantidadParams == 2)
+	{
+		int param1 = atoi((char*)list_get(lista_comandos, 1));
+		int param2 = atoi((char*)list_get(lista_comandos, 2));
+		GrabarSegmento(param1,param2);
+		MostrarSegmentos();
 		return 1;
 	}
 	if (string_equals_ignore_case(nombreFuncion, "RangosMemoriaLibres")
@@ -157,7 +163,7 @@ void GrabarSegmento(int programa, int tamano_Segmento) {
 	RangoMemoria rango;
 
 	if (!SePuedeGrabarSegmento(tamano_Segmento)) {
-		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento");
+		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento \n");
 		return;
 	}
 
@@ -216,16 +222,16 @@ int GuardarNuevoSegmentoOrdenado(int programa, int base_virtual, int tamano) {
 void CambiarAlgoritmo(char* nombre_algoritmo) {
 	if (string_equals_ignore_case("firstfit", nombre_algoritmo)) {
 		AlgoritmoActual = ALGOTIRMO_FIRSTFIT;
-		printf(" Se a cambiado el algoritmo a FirstFit ");
+		printf(" Se a cambiado el algoritmo a FirstFit \n ");
 		return;
 	}
 	if (string_equals_ignore_case("worstfit", nombre_algoritmo)) {
 		AlgoritmoActual = ALGOTIRMO_WORSTFIT;
-		printf(" Se a cambiado el algoritmo a WorstFit ");
+		printf(" Se a cambiado el algoritmo a WorstFit \n");
 		return;
 	}
 
-	printf("No existe un algoritmo con ese nombre");
+	printf("No existe un algoritmo con ese nombre\n");
 }
 
 // Nos dice si hay memoria disponible junta para grabar un sengmento de tamaño fijo -- Ok
@@ -267,6 +273,18 @@ void MostrarRangosMemoriaLibre() {
 	t_list* rangosLibres = RangosLibresDeMemoria();
 
 	list_iterate(rangosLibres, (void*)ContarTamano);
+
+}
+
+//Nos muestra los Segmentos Grabados -- ok
+void MostrarSegmentos() {
+
+	void Mostrar(Segmento* rango) {
+		 printf("Rango: Base %d , Tam: %d \n", rango->baseVirtual, rango->tamano);
+	}
+
+
+	list_iterate(Segmentos_UMV, (void*)Mostrar);
 
 }
 
@@ -328,7 +346,7 @@ void CompactaMemoria() {
 	long int salida, llegada;
 
 	if (list_is_empty(Segmentos_UMV)) {
-		printf("No Hay nada que compactar");
+		printf("No Hay nada que compactar\n");
 		return;
 	}
 
@@ -371,7 +389,7 @@ void CompactaMemoria() {
 		pos++;
 	}
 
-	printf("Compactacion Exitosa");
+	printf("Compactacion Exitosa\n");
 }
 
 // solicita bytes para grabar en memoria
@@ -379,7 +397,7 @@ void SolicitarBytesParaGrabar(int base, int offset, int tamano, void* buffer){
 	Segmento segmento = BuscarSegmento(base);
 	int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
 	if(max_direccion_mem_segmento < base + offset + tamano){
-		printf("Violacion de Segmento. Memoria no accesible por este segmento");
+		printf("Violacion de Segmento. Memoria no accesible por este segmento\n");
 		return;
 	}
 
@@ -392,7 +410,7 @@ void * EnviarBytes(int base, int offset, int tamano){
 	Segmento segmento = BuscarSegmento(base);
 	int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
 	if(max_direccion_mem_segmento < base + offset + tamano){
-		printf("Violacion de Segmento. Memoria no accesible por este segmento");
+		printf("Violacion de Segmento. Memoria no accesible por este segmento\n");
 		return NULL;
 	}
 
@@ -426,29 +444,29 @@ void EscucharYLanzarHilos() {
 
 	int servidor = socket_crearServidor("127.0.0.1", 5000);
 	if (servidor == -1) {
-		printf("Error Al Crear Servidor UMV. Contactese con servicio tecnico.");
+		printf("Error Al Crear Servidor UMV. Contactese con servicio tecnico.\n");
 		return;
 	}
 
 	while (1) {
 		int nueva_coneccion = socket_aceptarCliente(servidor);
 		if (servidor == -1) {
-			printf("Error Al Adquirir una nueva coneccion con el servidor UMV. Contactese con servicio tecnico.");
+			printf("Error Al Adquirir una nueva coneccion con el servidor UMV. Contactese con servicio tecnico.\n");
 			return;
 		}
 
 		void * handshake;
 		t_tipoEstructura tipo_estructura;
-		if(socket_recibir(nueva_coneccion,&tipo_estructura, &handshake) == -1){ printf("Error al recibir el tipo de proceso que se conecta.");}
+		if(socket_recibir(nueva_coneccion,&tipo_estructura, &handshake) == -1){ printf("Error al recibir el tipo de proceso que se conecta.\n");}
 
 		if(((t_struct_handshake_umv*)handshake)->tipoProceso == CONST_NUM_KERNEL){
-				printf("es un KERNEL");
+				printf("es un KERNEL\n");
 				pthread_t hilo_kernel;
 				pthread_create(&hilo_kernel, NULL, (void*) ManejoKernel, (void*)nueva_coneccion);
 		}
 
 		if(((t_struct_handshake_umv*)handshake)->tipoProceso == CONST_NUM_CPU){
-				printf("es una CPU");
+				printf("es una CPU\n");
 
 		}
 	}

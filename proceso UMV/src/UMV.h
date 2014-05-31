@@ -38,6 +38,8 @@ void ManejoKernel(int coneccion);
 void MostrarRangosMemoriaLibre();
 void EliminarSegmento(int base);
 void EliminarSegmentosDePrograma(int programa);
+void Mostrar(Segmento* rango);
+void MostrarSegmentos();
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();

@@ -6,6 +6,7 @@ int MemTotal;
 t_list * Segmentos_UMV;
 int AlgoritmoActual = 2;
 int FinPrograma = 0;
+int Retardo = 0;
 
 /////////////   COMIENZO MAIN  ///////////////////
 
@@ -125,7 +126,6 @@ int EjecutarComandos(t_list *lista_comandos) {
 	if (string_equals_ignore_case(nombreFuncion, "compactar")
 			&& cantidadParams == 0) {
 		CompactaMemoria();
-		return 1;
 	}
 	if (string_equals_ignore_case(nombreFuncion, "crearSegmento")
 			&& cantidadParams == 2)
@@ -134,23 +134,37 @@ int EjecutarComandos(t_list *lista_comandos) {
 		int param2 = atoi((char*)list_get(lista_comandos, 2));
 		GrabarSegmento(param1,param2);
 		MostrarSegmentos();
-		return 1;
 	}
 	if (string_equals_ignore_case(nombreFuncion, "RangosMemoriaLibres")
 			&& cantidadParams == 0) {
 		MostrarRangosMemoriaLibre();
-		return 1;
 	}
 	if (string_equals_ignore_case(nombreFuncion, "MostrarSegmento")
 			&& cantidadParams == 1) {
 		Segmento segmento = *((Segmento *)list_get(Segmentos_UMV,(int)list_get(lista_comandos, 1)));
 		printf("Segmento %d, Base: %d, Tamano: %d",(int)list_get(lista_comandos, 1), segmento.baseVirtual, segmento.tamano);
-		return 1;
 	}
 	if (string_equals_ignore_case(nombreFuncion, "CambiarAlgoritmo")
 			&& cantidadParams == 1) {
 		CambiarAlgoritmo((char*)list_get(lista_comandos, 1));
-		return 1;
+	}
+	if (string_equals_ignore_case(nombreFuncion, "CambiarAlgoritmo")
+			&& cantidadParams == 1) {
+		CambiarAlgoritmo((char*)list_get(lista_comandos, 1));
+	}
+	if (string_equals_ignore_case(nombreFuncion, "retardo")
+			&& cantidadParams == 1) {
+		int param1 = atoi((char*)list_get(lista_comandos, 1));
+		CambiarRetardo(param1);
+	}
+	if (string_equals_ignore_case(nombreFuncion, "dump")
+			&& cantidadParams == 0) {
+		Dump();
+	}
+	if (string_equals_ignore_case(nombreFuncion, "dump")
+			&& cantidadParams == 1) {
+		int param1 = atoi((char*)list_get(lista_comandos, 1));
+		DumpDeUnPrograma(param1);
 	}
 
 
@@ -271,7 +285,7 @@ void MostrarRangosMemoriaLibre() {
 	}
 
 	t_list* rangosLibres = RangosLibresDeMemoria();
-
+	printf("Rangos De Memoria Libre actuales del Sistema: \n");
 	list_iterate(rangosLibres, (void*)ContarTamano);
 
 }
@@ -279,11 +293,13 @@ void MostrarRangosMemoriaLibre() {
 //Nos muestra los Segmentos Grabados -- ok
 void MostrarSegmentos() {
 
+	if(list_is_empty(Segmentos_UMV))
+		return;
 	void Mostrar(Segmento* rango) {
-		 printf("Rango: Base %d , Tam: %d \n", rango->baseVirtual, rango->tamano);
+		 printf("Programa: %d - Rango: Base %d  - Tam: %d \n",rango->programa, rango->baseVirtual, rango->tamano);
 	}
 
-
+	printf("Segmetos actuales del Sistema: \n");
 	list_iterate(Segmentos_UMV, (void*)Mostrar);
 
 }
@@ -536,5 +552,31 @@ void EliminarSegmentosDePrograma(int programa){
 	}
 }
 
+// Muestreo de Datos
+void Dump(){
+	printf("Cantidad Memoria Libre: %d \n", CantidadMemoriaLibre());
 
+	MostrarSegmentos();
 
+	MostrarRangosMemoriaLibre();
+}
+
+// Muestreo de Datos por Programa
+void DumpDeUnPrograma(int Programa){
+
+	if(list_is_empty(Segmentos_UMV))
+			return;
+
+	void Mostrar(Segmento* rango) {
+		 if(Programa == rango->programa)
+			 printf("Rango: Base %d  - Tamano: %d \n", rango->baseVirtual, rango->tamano);
+	}
+
+	printf("Segmetos actuales del programa: %d \n", Programa);
+	list_iterate(Segmentos_UMV, (void*)Mostrar);
+}
+
+// Cambia la cantidad de milisegundos de retardo entre operaciones
+void CambiarRetardo(int retardo){
+	Retardo = retardo;
+}

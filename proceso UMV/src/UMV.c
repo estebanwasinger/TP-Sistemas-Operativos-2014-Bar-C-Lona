@@ -437,25 +437,6 @@ t_struct_respuesta_umv * EnviarBytes(int base, int offset, int tamano){
 	return buffer;
 }
 
-// Nos devuelve la pos del rango de mayor tamaño -- OK
-RangoMemoria RangoMasGrandeLibre() {
-	int pos = 0;
-	long int mayorTamano = 0;
-	RangoMemoria mayorRango;
-	t_list * rangos = RangosLibresDeMemoria();
-
-	while (list_size(rangos) > pos) {
-		RangoMemoria rango = *((RangoMemoria*) list_get(rangos, pos));
-		if (rango.tamano > mayorTamano) {
-			mayorRango = rango;
-			mayorTamano = rango.tamano;
-		}
-		pos++;
-	}
-
-	return mayorRango;
-}
-
 // Encargado de lanzar hilos de atencion y separarlos segun su funcionalidad
 void EscucharYLanzarHilos() {
 
@@ -465,8 +446,9 @@ void EscucharYLanzarHilos() {
 		return;
 	}
 
+	int nueva_coneccion;
 	while (1) {
-		int nueva_coneccion = socket_aceptarCliente(servidor);
+	    nueva_coneccion = socket_aceptarCliente(servidor);
 		if (servidor == -1) {
 			printf("Error Al Adquirir una nueva coneccion con el servidor UMV. Contactese con servicio tecnico.\n");
 			return;
@@ -477,49 +459,69 @@ void EscucharYLanzarHilos() {
 		if(socket_recibir(nueva_coneccion,&tipo_estructura, &handshake) == -1){ printf("Error al recibir el tipo de proceso que se conecta.\n");}
 
 		if(((t_struct_handshake_umv*)handshake)->tipoProceso == CONST_NUM_KERNEL){
-				printf("es un KERNEL\n");
+				printf("KERNEL\n");
 				pthread_t hilo_kernel;
 				pthread_create(&hilo_kernel, NULL, (void*) ManejoKernel, (void*)nueva_coneccion);
 		}
 
 		if(((t_struct_handshake_umv*)handshake)->tipoProceso == CONST_NUM_CPU){
-				printf("es una CPU\n");
-
+				printf("CPU Conectada\n");
+				pthread_t hilo_cpu;
+				pthread_create(&hilo_cpu, NULL, (void*) ManejoCPU, (void*)nueva_coneccion); //Fijarse si el parametro se pasa bien
 		}
 	}
 
 }
 
 // se encarga de manejar la conneccion con el kernel
-void ManejoKernel(int coneccion){
+void ManejoKernel(int nueva_coneccion){
 	t_tipoEstructura tipo_estructura;
-	void * nuevoSegmento;
-	socket_recibir(coneccion,&tipo_estructura, &nuevoSegmento);
-	if(tipo_estructura == D_STRUCT_CREAR_SEGMENTO){
+	int coneccion = nueva_coneccion;
+	void * estructura;
+	socket_recibir(coneccion,&tipo_estructura, &estructura);
 
+	if(tipo_estructura == D_STRUCT_CREAR_SEGMENTO){
+		t_struct_crear_segmento creador = *((t_struct_crear_segmento*)estructura);
+		GrabarSegmento(creador.ID,creador.tamanio);
 	}
 	else if(tipo_estructura == D_STRUCT_BORRAR_SEGMENTOS){
-
+		t_struct_borrar_segmentos eliminador = *((t_struct_borrar_segmentos*)estructura);
+		EliminarSegmentosDePrograma(eliminador.ID);
 	}
 	else if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES){
-
+		t_struct_sol_bytes solicitud = *((t_struct_sol_bytes*)estructura);
+		t_struct_respuesta_umv respuesta_solitud = *(EnviarBytes(solicitud.base,solicitud.offset,solicitud.tamanio));
+		socket_enviar(coneccion, D_STRUCT_RESPUESTA_UMV,(void*)respuesta_solitud);
 	}
 	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES){
-
+		t_struct_env_bytes envio = *((t_struct_env_bytes*)estructura);
+		SolicitarBytesParaGrabar(envio.base,envio.offset,envio.tamanio,envio.buffer);
 	}
 }
 
 // se encarga de manejar una coneccion con una CPU
-void ManejoCPU(int coneccion){
+void ManejoCPU(int nueva_coneccion){
+	int coneccion = nueva_coneccion;
 	t_tipoEstructura tipo_estructura;
 	void * estructura;
 	socket_recibir(coneccion, &tipo_estructura, &estructura);
-	if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES){
-
+	if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES)
+	{
+		t_struct_sol_bytes solicitud = *((t_struct_sol_bytes*)estructura);
+		t_struct_respuesta_umv respuesta_solitud = *(EnviarBytes(solicitud.base,solicitud.offset,solicitud.tamanio));
+		socket_enviar(coneccion, D_STRUCT_RESPUESTA_UMV,(void*)respuesta_solitud);
 	}
-	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES){
-
+	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES)
+	{
+		t_struct_env_bytes envio = *((t_struct_env_bytes*)estructura);
+		SolicitarBytesParaGrabar(envio.base,envio.offset,envio.tamanio,envio.buffer);
 	}
+	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES)
+	{
+		t_struct_env_bytes envio = *((t_struct_env_bytes*)estructura);
+		SolicitarBytesParaGrabar(envio.base,envio.offset,envio.tamanio,envio.buffer);
+	}
+
 }
 
 // devuelve la posicion de un segmento en la lista de segmentos por su base -- OK
@@ -598,4 +600,23 @@ void DumpDeUnPrograma(int Programa){
 // Cambia la cantidad de milisegundos de retardo entre operaciones
 void CambiarRetardo(int retardo){
 	Retardo = retardo;
+}
+
+// Nos devuelve la pos del rango de mayor tamaño -- OK
+RangoMemoria RangoMasGrandeLibre() {
+	int pos = 0;
+	long int mayorTamano = 0;
+	RangoMemoria mayorRango;
+	t_list * rangos = RangosLibresDeMemoria();
+
+	while (list_size(rangos) > pos) {
+		RangoMemoria rango = *((RangoMemoria*) list_get(rangos, pos));
+		if (rango.tamano > mayorTamano) {
+			mayorRango = rango;
+			mayorTamano = rango.tamano;
+		}
+		pos++;
+	}
+
+	return mayorRango;
 }

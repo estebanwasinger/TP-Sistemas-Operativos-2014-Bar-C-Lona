@@ -174,12 +174,12 @@ int EjecutarComandos(t_list *lista_comandos) {
 }
 
 // Elije una base aleatoria y graba el segmento segun el algoritmo indicado -- Ok
-void GrabarSegmento(int programa, int tamano_Segmento) {
+int GrabarSegmento(int programa, int tamano_Segmento) {
 	RangoMemoria rango;
 
 	if (!SePuedeGrabarSegmento(tamano_Segmento)) {
 		printf("MEMORY OVERLOAD, No hay memoria para grabar el segmento \n");
-		return;
+		return -1;
 	}
 
 	// segun el algoritmo se elige un rago de memoria para grabar
@@ -206,6 +206,8 @@ void GrabarSegmento(int programa, int tamano_Segmento) {
 	long int base = rand() % mayor_base + menor_base;
 	// guardamos ordenado
 	GuardarNuevoSegmentoOrdenado(programa, base, tamano_Segmento);
+
+	return base;
 }
 
 // Guarda el un nuevo segmento ordenado por su base en lista de segmentos -- OK
@@ -483,11 +485,16 @@ void ManejoKernel(int nueva_coneccion){
 
 	if(tipo_estructura == D_STRUCT_CREAR_SEGMENTO){
 		t_struct_crear_segmento creador = *((t_struct_crear_segmento*)estructura);
-		GrabarSegmento(creador.ID,creador.tamanio);
+		t_struct_numero * base = malloc(sizeof(t_struct_numero));
+		base->numero = GrabarSegmento(creador.ID,creador.tamanio);
+		socket_enviar(coneccion,D_STRUCT_NUMERO,base);
 	}
 	else if(tipo_estructura == D_STRUCT_BORRAR_SEGMENTOS){
 		t_struct_borrar_segmentos eliminador = *((t_struct_borrar_segmentos*)estructura);
 		EliminarSegmentosDePrograma(eliminador.ID);
+		t_struct_numero * base = malloc(sizeof(t_struct_numero));
+		base->numero = 1;
+		socket_enviar(coneccion,D_STRUCT_NUMERO,base);
 	}
 	else if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES){
 		t_struct_sol_bytes solicitud = *((t_struct_sol_bytes*)estructura);
@@ -497,6 +504,9 @@ void ManejoKernel(int nueva_coneccion){
 	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES){
 		t_struct_env_bytes envio = *((t_struct_env_bytes*)estructura);
 		SolicitarBytesParaGrabar(envio.base,envio.offset,envio.tamanio,envio.buffer);
+		t_struct_numero * base = malloc(sizeof(t_struct_numero));
+		base->numero = 1;
+		socket_enviar(coneccion,D_STRUCT_NUMERO,base);
 	}
 }
 

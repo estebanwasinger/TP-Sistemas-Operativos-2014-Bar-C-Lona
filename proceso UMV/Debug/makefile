@@ -26,7 +26,7 @@ endif
 all: UMV
 
 dependents:
-	-cd /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug && $(MAKE) clean all
+	-cd /home/utnso/workspace/tp-2014-1c-bar-c-lona/pruebaShared/Debug && $(MAKE) all
 	-cd /home/utnso/workspace/tp-2014-1c-bar-c-lona/proceso\ UMV/Release && $(MAKE) clean all
 
 # Tool invocations

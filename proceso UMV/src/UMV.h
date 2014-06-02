@@ -33,7 +33,6 @@ void CompactaMemoria();
 void ContarTamano(RangoMemoria* rango);
 void Grabar(int posMem, void * element);
 void * Consultar(int posMem);
-void GrabarSegmento(int programa, int tamanoSegmento);
 void ManejoKernel(int coneccion);
 void MostrarRangosMemoriaLibre();
 void EliminarSegmento(int base);
@@ -48,6 +47,7 @@ void ManejoKernel(int nueva_coneccion);
 void ManejoCPU(int nueva_coneccion);
 
 //Firmas funciones Int
+int GrabarSegmento(int programa, int tamanoSegmento);
 int ObtenerCantidadMemoriaTotal();
 int EjecutarComandos(t_list *lista);
 int GuardarNuevoSegmentoOrdenado();

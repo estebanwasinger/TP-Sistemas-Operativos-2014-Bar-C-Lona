@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 
 	int socketKernel;
 	socketKernel = socket_crearCliente();
-	socket_conectarCliente(socketKernel, "127.0.0.1", 5000);
+	socket_conectarCliente(socketKernel, "127.0.0.1", 6000);
 
 	//**********************************//
 	//	   Leectura y envio de codigo	//
@@ -98,7 +98,10 @@ int main(int argc, char** argv) {
 	int size = size_archivo(file);
 	char* codigo = leer_codAnsisop(file);
 
-	socket_enviar(socketKernel,D_STRUCT_STRING,codigo);
+	t_struct_string * codigoAEnviar = malloc(sizeof(t_struct_string));
+	codigoAEnviar->string = codigo;
+
+	socket_enviar(socketKernel,D_STRUCT_STRING,codigoAEnviar);
 
 	while(1){
 
@@ -142,6 +145,6 @@ char* leer_codAnsisop(FILE *file) {
 
 FILE *abrir_archivoRO(char** argv) {
 	//printf("%s \n", argv[2]);
-	return (fopen("completo.ansisop", "r"));
+	return (fopen("/home/utnso/workspace/tp-2014-1c-bar-c-lona/procesoPrograma/Debug/facil.ansisop", "r"));
 }
 

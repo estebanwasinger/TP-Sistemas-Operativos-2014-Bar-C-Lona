@@ -23,6 +23,7 @@ int main(void) {
 	}
 	MemFisica = malloc(MemTotal);
 
+	EscucharYLanzarHilos();
 	Consola();
 
 	return EXIT_SUCCESS;
@@ -491,7 +492,7 @@ void ManejoKernel(int nueva_coneccion){
 	else if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES){
 		t_struct_sol_bytes solicitud = *((t_struct_sol_bytes*)estructura);
 		t_struct_respuesta_umv respuesta_solitud = *(EnviarBytes(solicitud.base,solicitud.offset,solicitud.tamanio));
-		socket_enviar(coneccion, D_STRUCT_RESPUESTA_UMV,(void*)respuesta_solitud);
+		socket_enviar(coneccion, D_STRUCT_RESPUESTA_UMV,&respuesta_solitud);
 	}
 	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES){
 		t_struct_env_bytes envio = *((t_struct_env_bytes*)estructura);
@@ -509,7 +510,7 @@ void ManejoCPU(int nueva_coneccion){
 	{
 		t_struct_sol_bytes solicitud = *((t_struct_sol_bytes*)estructura);
 		t_struct_respuesta_umv respuesta_solitud = *(EnviarBytes(solicitud.base,solicitud.offset,solicitud.tamanio));
-		socket_enviar(coneccion, D_STRUCT_RESPUESTA_UMV,(void*)respuesta_solitud);
+		socket_enviar(coneccion, D_STRUCT_RESPUESTA_UMV,&respuesta_solitud);
 	}
 	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES)
 	{

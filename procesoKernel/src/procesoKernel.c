@@ -11,6 +11,9 @@
 
 pthread_t hiloPLP;
 pthread_t hiloPCP;
+pthread_t pasarNewAReady;
+
+pthread_mutex_t S_Lista_New = PTHREAD_MUTEX_INITIALIZER;
 
 t_list *listaNEW;
 t_list *listaREADY;
@@ -24,6 +27,8 @@ t_list *listaProcesosActivos;
 #define MAX_CONNECTION_SERVER 60
 
 int ID=0;
+unsigned int nivelDeMultiProgramacionActual=0;
+
 
 
 
@@ -77,21 +82,29 @@ void* mainPLP() {
 		printf("\nError al crear el cliente UMV\n");
 	}
 
-	int fallo = socket_conectarCliente(socketUMV, "127.0.0.1", 4000);
+	int fallo = socket_conectarCliente(socketUMV, "127.0.0.1", 5000);
 	if (fallo == -1) {
 		printf("\n Error al conectarse a la UMV \n");
 	}
 
+	t_struct_handshake_umv * handshake = malloc(sizeof(t_struct_handshake_umv));
+	handshake->tipoProceso=1;
+
+	socket_enviar(socketUMV,D_STRUCT_HANDSHAKE_UMV,handshake);
+
 	// Se crea el socket/estructuraAuxNuevosProcesos/se crea el server
 	int socketPLP;
 	t_struct_descriptor_procesos*nuevoProceso=malloc(sizeof(t_struct_descriptor_procesos));
-	socketPLP = socket_crearServidor("127.0.0.1", 5000);
+	socketPLP = socket_crearServidor("127.0.0.1", 6000);
 
 	//Se crea puntero donde se va a guardar el codigoAnsisop/variable de la estructura recibida
-	void * codigoAnsisop;
-	t_tipoEstructura tipoEstructura;
+
 
 	while(1){
+
+		void * codigoAnsisop;
+			t_tipoEstructura tipoEstructura;
+
 		printf("Esperando conexión entrante de ProcesoPrograma");
 		//Se crea el socketPLPdeescucha/ se bloquea hasta encontrar una conexión entrante
 		int * socketPLPEscucha = malloc(sizeof(int));
@@ -100,10 +113,10 @@ void* mainPLP() {
 
 		//Se recibe el cóodigo ansisop
 		socket_recibir(*socketPLPEscucha, &tipoEstructura, &codigoAnsisop);
-		char* codigoAnsisopLiteral = (((t_struct_string*) codigoAnsisop)->string);
+		char* codigoAnsisopLiteral = (((t_struct_string*)codigoAnsisop)->string);
 
 		//Creacion del PCB
-		t_medatada_program * metadata = metadatada_desde_literal(codigoAnsisopLiteral);
+		t_metadata_program * metadata = metadatada_desde_literal(codigoAnsisopLiteral);
 		t_struct_pcb * nuevoPCB = malloc(sizeof(t_struct_pcb));
 		nuevoPCB->iD = obtenerID();
 		nuevoProceso->ID = nuevoPCB->iD;
@@ -153,6 +166,8 @@ void* mainPLP() {
 		pesoPCB->pcb = nuevoPCB;
 		pesoPCB->peso = pesoJob;
 
+		//Insertar en las correspondientes listas
+		list_add(listaProcesosActivos,nuevoProceso);
 		insertarPCBOrdenadoSJN(listaNEW, pesoPCB);
 
 		free(solicitud);
@@ -163,7 +178,9 @@ void* mainPLP() {
 }
 void* mainPCP() {
 	printf("Hola soy el PCP \n\n");
-	pasarPCBsimple(listaNEW, listaREADY);
+//	pthread_create(&pasarNewAReady, NULL, newAReady, NULL );
+
+
 	return 0;
 }
 
@@ -188,8 +205,9 @@ void insertarPCBOrdenadoSJN(t_list *lista, t_struct_peso_pcb *registroPCB) {
 			pos++;
 
 		}
-
+		pthread_mutex_lock(&S_Lista_New);
 		list_add_in_index(lista, (pos + 1), registroPCB);
+		pthread_mutex_unlock(&S_Lista_New);
 	}
 }
 
@@ -199,7 +217,9 @@ void pasarPCB(t_list *lista1, t_list *lista2) {
 
 void pasarPCBsimple(t_list *listaNew, t_list *listaReady) {
 	t_struct_pcb *nuevoPCB = ((t_struct_peso_pcb*)(list_remove(listaNew, 0)))->pcb;
+	pthread_mutex_lock(&S_Lista_New);
 	list_add(listaReady, nuevoPCB);
+	pthread_mutex_unlock(&S_Lista_New);
 }
 
 int solicitarCreacionSegmento(int socketUMV,int tamanio,int ID){
@@ -212,3 +232,13 @@ int solicitarCreacionSegmento(int socketUMV,int tamanio,int ID){
 		socket_recibir(socketUMV,&numeroEstruct,&direccionRecibida);
 		return((t_struct_numero*)direccionRecibida)->numero;
 	}
+
+void* newAReady() {
+	while (1) {
+		if (nivelDeMultiProgramacionActual < 5) {
+			pasarPCBsimple(listaNEW, listaREADY);
+		}
+	}
+
+	return 0;
+}

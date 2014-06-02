@@ -43,6 +43,9 @@ void MostrarSegmentos();
 void Dump();
 void DumpDeUnPrograma(int Programa);
 void CambiarRetardo(int retardo);
+void EscucharYLanzarHilos();
+void ManejoKernel(int nueva_coneccion);
+void ManejoCPU(int nueva_coneccion);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();

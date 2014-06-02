@@ -421,7 +421,7 @@ void SolicitarBytesParaGrabar(int base, int offset, int tamano, void* buffer){
 }
 
 // Envia bytes
-void * EnviarBytes(int base, int offset, int tamano){
+t_struct_respuesta_umv * EnviarBytes(int base, int offset, int tamano){
 
 	Segmento segmento = BuscarSegmento(base);
 	int max_direccion_mem_segmento = segmento.tamano + segmento.baseVirtual;
@@ -430,9 +430,10 @@ void * EnviarBytes(int base, int offset, int tamano){
 		return NULL;
 	}
 
-	void * buffer;
+	t_struct_respuesta_umv * buffer;
 	buffer = malloc(tamano);
 	memcpy(buffer,(MemFisica + base + offset), tamano);
+	buffer->tamano_buffer = tamano;
 	return buffer;
 }
 
@@ -494,6 +495,18 @@ void ManejoKernel(int coneccion){
 	t_tipoEstructura tipo_estructura;
 	void * nuevoSegmento;
 	socket_recibir(coneccion,&tipo_estructura, &nuevoSegmento);
+	if(tipo_estructura == D_STRUCT_CREAR_SEGMENTO){
+
+	}
+	else if(tipo_estructura == D_STRUCT_BORRAR_SEGMENTOS){
+
+	}
+	else if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES){
+
+	}
+	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES){
+
+	}
 }
 
 // se encarga de manejar una coneccion con una CPU
@@ -501,6 +514,12 @@ void ManejoCPU(int coneccion){
 	t_tipoEstructura tipo_estructura;
 	void * estructura;
 	socket_recibir(coneccion, &tipo_estructura, &estructura);
+	if(tipo_estructura == D_STRUCT_SOLICITAR_BYTES){
+
+	}
+	else if(tipo_estructura == D_STRUCT_ENVIAR_BYTES){
+
+	}
 }
 
 // devuelve la posicion de un segmento en la lista de segmentos por su base -- OK

@@ -34,6 +34,8 @@ t_stream * paquetizarStruct_env_bytes(t_struct_env_bytes * estructuraOrigen);
 t_stream * paquetizarStruct_sol_bytes(t_struct_sol_bytes * estructuraOrigen);
 t_stream * paquetizarStruct_crear_segmento(t_struct_crear_segmento * estructuraOrigen);
 t_stream * paquetizarStruct_borrar_segmentos(t_struct_borrar_segmentos * estructuraOrigen);
+t_stream * paquetizarStruct_respuesta_umv(t_struct_respuesta_umv * estructuraOrigen);
+
 // ---------------------------------------------------------------------------
 
 //FUNCIONES DE HEADER QUE SIRVEN PARA PAQUETIZAR
@@ -54,8 +56,10 @@ t_struct_signal * despaquetizarStruct_signal(char * dataPaquete, uint16_t length
 t_struct_pcb * despaquetizarStruct_pcb(char * dataPaquete, uint16_t length);
 t_struct_env_bytes * despaquetizarStruct_env_bytes(char * dataPaquete,uint16_t length);
 t_struct_sol_bytes * despaquetizarStruct_sol_bytes(char * dataPaquete,uint16_t length);
-t_struct_borrar_segmentos * despaquetizarStruct_crear_segmento(char * dataPaquete,uint16_t length);
+t_struct_crear_segmento * despaquetizarStruct_crear_segmento(char * dataPaquete,uint16_t length);
 t_struct_borrar_segmentos * despaquetizarStruct_borrar_segmentos(char * dataPaquete,uint16_t length);
+t_struct_respuesta_umv * despaquetizarStruct_respuesta_umv(char * dataPaquete,uint16_t length);
+
 
 // ---------------------------------------------------------------------------
 

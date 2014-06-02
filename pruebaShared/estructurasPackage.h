@@ -55,6 +55,8 @@
 #define D_STRUCT_ENVIAR_BYTES 8
 #define D_STRUCT_CREAR_SEGMENTO 9
 #define D_STRUCT_BORRAR_SEGMENTOS 10
+#define D_STRUCT_RESPUESTA_UMV 11
+
 
 //Estructura auxiliar de stream
 typedef struct {
@@ -126,6 +128,7 @@ typedef struct struct_pcb {
 
 } __attribute__ ((__packed__)) t_struct_pcb;
 
+//Estructura tipo STRUCT_SOLICITAR_BYTES(7)
 typedef struct struct_sol_bytes{
 	uint32_t base;
 	uint16_t offset;
@@ -133,6 +136,7 @@ typedef struct struct_sol_bytes{
 
 }__attribute__((__packed__)) t_struct_sol_bytes;
 
+//Estructura tipo STRUCT_ENVIAR_BYTES(8)
 typedef struct struct_env_bytes{
 	uint32_t base;
 	uint16_t offset;
@@ -140,15 +144,21 @@ typedef struct struct_env_bytes{
 	void* buffer;
 }__attribute__((__packed__)) t_struct_env_bytes;
 
+//Estructura tipo STRUCT_CREAR_SEGMENTO(9)
 typedef struct struct_crear_segmento{
 	uint32_t ID;
 	uint32_t tamanio;
 }__attribute__((__packed__)) t_struct_crear_segmento;
 
+//Estructura tipo STRUCT_BORRAR_SEGMENTO(10)
 typedef struct struct_borrar_segmentos{
 	uint32_t ID;
 }__attribute__((__packed__)) t_struct_borrar_segmentos;
 
-
+//Estructura tipo STRUCT_RESPUESTA_UMV(11)
+typedef struct struct_respuesta_UMV{
+	void* buffer;
+	uint32_t tamano_buffer;
+}__attribute__((__packed__)) t_struct_respuesta_umv;
 
 #endif /* ESTRUCTURASPACKAGE_H_ */

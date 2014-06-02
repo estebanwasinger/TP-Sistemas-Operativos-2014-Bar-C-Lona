@@ -40,6 +40,9 @@ void EliminarSegmento(int base);
 void EliminarSegmentosDePrograma(int programa);
 void Mostrar(Segmento* rango);
 void MostrarSegmentos();
+void Dump();
+void DumpDeUnPrograma(int Programa);
+void CambiarRetardo(int retardo);
 
 //Firmas funciones Int
 int ObtenerCantidadMemoriaTotal();

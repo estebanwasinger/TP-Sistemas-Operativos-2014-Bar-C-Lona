@@ -111,45 +111,34 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 
 	t_struct_sol_bytes * solicitar_indice = malloc(sizeof(t_struct_sol_bytes));
 
-	solicitar_indice->base=temp_ind_codigo;
+    solicitar_indice->base=temp_ind_codigo;
 	solicitar_indice->offset=temp_ind_codigo;
 	solicitar_indice->tamanio=2*sizeof(uint32_t);
 
-	printf("%d\n",solicitar_indice->tamanio);
+	socket_UMV=socket_crearYConectarCliente(IP_UMV,Puerto_UMV); //nos conectamos a la UMV
+	//socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice);
 
+//ACA DEBERIAMOS RECIBIR EL BUFFER CON EL INDICE Y DE AHI
+	typedef struct recibir_indice{
 
+		uint32_t indice;
+		uint32_t longitud;
 
+	}__attribute__((__packed__)) t_struct_rec_inidices;
 
-//socket_UMV=socket_crearYConectarCliente(IP_UMV,Puerto_UMV); //nos conectamos a la UMV
-//socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice); // le envio a la umv el base_indice y offset para que
-																	 //me devuelva los 8 bytes que hay despues de esa base
+    t_struct_rec_inidices  * recibir_indice = malloc(sizeof(t_struct_rec_inidices));
 
-//aca vamos a recibir el char* conteniendo el numero de Indice de Codigo y su desplazamiento, para asi poder enviarle
-//la base del segemento codigo con el offset y el tamnio.
-//socket_recibir(socket_recibir,tipo_recibir_bytes,t_struct_recibir_bytes);
+   recibir_indice->indice=56;
+   recibir_indice->longitud=14;
+
+   //aca tengo que armar el solicitar_instruccion base=seg_codigo;offset=recibir.indice;tamanio=recibir.longitud
+
+   //socket_enviar(socket_UMV,D_STRUCT_NUMERO,solicitar_instruccion);
 
 
  dicc_variables =dictionary_create(); // este el diccinario de las variables del programa.
 
 
-//estas son pruebas.
-
-//    t_stream * unStream = malloc(sizeof(t_stream));
-//    t_struct_env_bytes * env1=malloc(sizeof(t_struct_env_bytes));
-//
-//    env1->base=23;
-//    env1->offset=12;
-//    env1->tamanio=12;
-//    env1->buffer=strdup("holacomoteva");
-//
-//   unStream = paquetizarStruct_env_bytes(env1);
-
-//   printf("hola\n");
-//   printf("%d\n",unStream->length);
-//   printf("%s\n",unStream->data);
-//   printf("hola\n");
-
-//}
 
 	return 0;
 

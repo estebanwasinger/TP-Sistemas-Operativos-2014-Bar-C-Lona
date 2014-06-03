@@ -116,20 +116,25 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 	solicitar_indice->tamanio=2*sizeof(uint32_t);
 
 	socket_UMV=socket_crearYConectarCliente(IP_UMV,Puerto_UMV); //nos conectamos a la UMV
-	//socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice);
+	socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice);//le enviamos el indice con la longitud de la proxima instruccion a ejecutar
+
 
 //ACA DEBERIAMOS RECIBIR EL BUFFER CON EL INDICE Y DE AHI
-	typedef struct recibir_indice{
 
-		uint32_t indice;
-		uint32_t longitud;
 
-	}__attribute__((__packed__)) t_struct_rec_inidices;
 
-    t_struct_rec_inidices  * recibir_indice = malloc(sizeof(t_struct_rec_inidices));
 
-   recibir_indice->indice=56;
-   recibir_indice->longitud=14;
+//	typedef struct recibir_indice{
+//
+//		uint32_t indice;
+//		uint32_t longitud;
+//
+//	}__attribute__((__packed__)) t_struct_rec_inidices;
+//
+//    t_struct_rec_inidices  * recibir_indice = malloc(sizeof(t_struct_rec_inidices));
+//
+//   recibir_indice->indice=56;
+//   recibir_indice->longitud=14;
 
    //aca tengo que armar el solicitar_instruccion base=seg_codigo;offset=recibir.indice;tamanio=recibir.longitud
 

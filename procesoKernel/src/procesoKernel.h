@@ -18,6 +18,7 @@
 #include <commons/string.h>
 #include <pthread.h>
 #include <commons/collections/list.h>
+#include <commons/config.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -25,6 +26,7 @@
 #include <socket.h>
 #include <package.h>
 #include <estructurasPackage.h>
+
 
 
 typedef struct registroPCB {
@@ -41,6 +43,10 @@ void insertarPCBOrdenadoSJN(t_list *lista, t_struct_peso_pcb *registroPCB);
 int calcularPesoJob(t_medatada_program* metadata);
 void pasarPCBsimple(t_list *listaNew, t_list *listaReady);
 int solicitarCreacionSegmento(int socketUMV,int tamanio,int ID);
+void* newAReady();
+int conf_es_valida(t_config * configuracion);
+int string_count(char * text, char c);
+int cargarArchivoConfiguracion();
 
 
 typedef struct aux_programas {

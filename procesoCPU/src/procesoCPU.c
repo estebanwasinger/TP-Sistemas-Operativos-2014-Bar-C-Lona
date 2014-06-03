@@ -119,7 +119,7 @@ if (!conf_es_valida(configuracion)) //ver que el archivo de config tenga todito
 	socket_enviar(socket_UMV,D_STRUCT_SOLICITAR_BYTES,solicitar_indice);//le enviamos el indice con la longitud de la proxima instruccion a ejecutar
 
 
-//ACA DEBERIAMOS RECIBIR EL BUFFER CON EL INDICE Y DE AHI
+//ACA DEBERIAMOS RECIBIR EL BUFFER CON EL INDICE
 
 
 
@@ -162,19 +162,19 @@ int conf_es_valida(t_config * configuracion) // verifica que el arch de conf ten
 
 
 //PRIMITIVAS ANSISOP
+
+t_puntero definirVariable(t_nombre_variable  identificador_variable){
+
+
+	memcpy(&var_seg_stack ,&identificador_variable ,sizeof(t_nombre_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
+	//asegurarme que identificador_variable sea dianmico.
+
+    socket_enviar(socket_UMV,)
+	dictionary_put(dicc_variables,&identificador_variable,&var_seg_stack+sizeof(t_nombre_variable));
+    return var_seg_stack+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
+
+}
 //
-//t_puntero definirVariable(t_nombre_variable  identificador_variable){
-//
-//
-//	memcpy(&var_seg_stack ,&identificador_variable ,sizeof(t_nombre_variable)); //aca ver seria mejor solo usar el sizeof(t_nombre_variable)
-//	//asegurarme que identificador_variable sea dianmico.
-//
-//
-//	dictionary_put(dicc_variables,&identificador_variable,&var_seg_stack+sizeof(t_nombre_variable));
-//    return var_seg_stack+sizeof(t_nombre_variable); // posicion del valor de la variable en el stack
-//
-//}
-////
 //
 //t_puntero obtenerPosicionVariable(t_nombre_variable identificador_variable){
 //

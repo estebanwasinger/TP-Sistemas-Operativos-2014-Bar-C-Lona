@@ -342,9 +342,9 @@ t_stream * paquetizarStruct_respuesta_umv(t_struct_respuesta_umv * estructuraOri
 
 	int tamanoTotal = sizeof(t_header);
 
-	memcpy(data + tamanoTotal, estructuraOrigen,sizeof(t_struct_env_bytes));
+	memcpy(data + tamanoTotal, estructuraOrigen,sizeof(t_struct_respuesta_umv));
 
-	tamanoTotal += sizeof(t_struct_env_bytes);
+	tamanoTotal += sizeof(t_struct_respuesta_umv);
 
 	memcpy(data + tamanoTotal, estructuraOrigen->buffer, estructuraOrigen->tamano_buffer);		//copio a data el nombre.
 
@@ -662,7 +662,6 @@ t_header despaquetizarHeader(char * header){
 }
 
 t_struct_respuesta_umv * despaquetizarStruct_respuesta_umv(char * dataPaquete,uint16_t length){
-
 	void * buffer = malloc(length - sizeof(t_struct_respuesta_umv));
 	t_struct_respuesta_umv * estructuraDestino = malloc(sizeof(t_struct_respuesta_umv));
 
